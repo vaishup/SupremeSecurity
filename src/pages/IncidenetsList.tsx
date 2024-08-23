@@ -67,7 +67,7 @@ const IncidenetsList = () => {
   const navigation = useNavigate();
   return (
     <>
-      <DefaultLayout>
+    
         <div className="flex items-center justify-between">
           <h2 className="text-title-md2 font-semibold text-primary dark:text-white">
             Incident's List
@@ -106,7 +106,7 @@ const IncidenetsList = () => {
   </div>
 </div>
 
-      </DefaultLayout>
+   
     </>
   );
 };

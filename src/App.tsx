@@ -1,234 +1,106 @@
-import { useEffect, useState } from 'react';
-import { Route, Routes, useLocation } from 'react-router-dom';
+import { Route, Routes, Navigate, useNavigate } from 'react-router-dom';
+import React, { Suspense, lazy, useEffect, useState } from 'react';
 
 import Loader from './common/Loader';
-import PageTitle from './components/PageTitle';
 import SignIn from './pages/Authentication/SignIn';
-import SignUp from './pages/Authentication/SignUp';
-import Chart from './pages/Chart';
 import Dashboard from './pages/Dashboard/Dashboard';
-import FormElements from './pages/Form/FormElements';
-import FormLayout from './pages/Form/FormLayout';
-import Profile from './pages/Profile';
-import Settings from './pages/Settings';
-import Tables from './pages/Tables';
-import Alerts from './pages/UiElements/Alerts';
-import Buttons from './pages/UiElements/Buttons';
-import DriverList from './pages/DriverList';
-import AddClient from './pages/AddClient';
-import ClientList from './pages/ClientList';
-import StaffList from './pages/StaffList';
-import TaskList from './pages/TaskList';
-import AddStaff from './pages/AddStaff';
-import AddTask from './pages/AddTask';
-import IncidenetsList from './pages/IncidenetsList';
+import config from './amplifyconfiguration.json';
+import DefaultLayout from './layout/DefaultLayout';
+import { Toaster } from 'react-hot-toast';
+import { Amplify } from 'aws-amplify';
+import routes from './routes';
+Amplify.configure(config);
 
 function App() {
+    const navigate = useNavigate();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loading, setLoading] = useState<boolean>(true);
-  const { pathname } = useLocation();
 
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [pathname]);
-
+ 
   useEffect(() => {
     setTimeout(() => setLoading(false), 1000);
   }, []);
 
+  const handleLoginSuccess = () => {
+    console.log('handleLogin ', isLoggedIn);
+    setIsLoggedIn(true);
+    const loginTimestamp = new Date().getTime().toString();
+    localStorage.setItem('loginTimestamp', loginTimestamp);
+    navigate('/');
+  };
+
+  const checkLoginStatus = async () => {
+    console.log('checkLoginStatus');
+    const loginTimestamp = localStorage.getItem('loginTimestamp');
+    try {
+      // const user = await Auth.currentAuthenticatedUser();
+      const user = { username: 'Admin' };
+
+      const currentTime = new Date().getTime();
+      const oneDay = 7 * 24 * 60 * 60 * 1000; // 1 week
+
+      if (
+        loginTimestamp &&
+        currentTime - parseInt(loginTimestamp, 10) < oneDay
+      ) {
+        console.log('Login as ', user.username);
+        setIsLoggedIn(true);
+        localStorage.setItem('loginTimestamp', currentTime.toString());
+      } else {
+        console.log('Login X - over 24 hour');
+        localStorage.removeItem('loginTimestamp');
+      }
+      setLoading(false);
+    } catch (error) {
+      console.log('Login X');
+      localStorage.removeItem('loginTimestamp');
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    checkLoginStatus();
+  }, []);
   return loading ? (
     <Loader />
   ) : (
     <>
+      <Toaster
+        position="top-right"
+        reverseOrder={false}
+        containerClassName="overflow-auto"
+      />
       <Routes>
         <Route
-          index
-          element={
-            <>
-              <PageTitle title="SSS" />
-              <Dashboard />
-            </>
-          }
-        />
-
-        <Route
-          path="/driversList"
-          element={
-            <>
-              <PageTitle title="Calendar | TailAdmin - Tailwind CSS Admin Dashboard Template" />
-              <DriverList />
-            </>
-          }
-        />
-
-        <Route
-          path="/addClient"
-          element={
-            <>
-              <PageTitle title="Calendar | TailAdmin - Tailwind CSS Admin Dashboard Template" />
-
-              <AddClient />
-            </>
-          }
-        />
-        <Route
-          path="/staffList"
-          element={
-            <>
-              <PageTitle title="Calendar | TailAdmin - Tailwind CSS Admin Dashboard Template" />
-
-              <StaffList />
-            </>
-          }
-        />
- <Route
-          path="/IncidenetsList"
-          element={
-            <>
-              <PageTitle title="Calendar | TailAdmin - Tailwind CSS Admin Dashboard Template" />
-
-              <IncidenetsList />
-            </>
-          }
-        />
-        <Route
-          path="/taskList"
-          element={
-            <>
-              <PageTitle title="Calendar | TailAdmin - Tailwind CSS Admin Dashboard Template" />
-
-              <TaskList />
-            </>
-          }
-        />
-        <Route
-          path="/profile"
-          element={
-            <>
-              <PageTitle title="Profile | TailAdmin - Tailwind CSS Admin Dashboard Template" />
-              <Profile />
-            </>
-          }
-        />
-        <Route
-          path="/forms/form-elements"
-          element={
-            <>
-              <PageTitle title="Form Elements | TailAdmin - Tailwind CSS Admin Dashboard Template" />
-              <FormElements />
-            </>
-          }
-        />
-        <Route
-          path="/forms/form-layout"
-          element={
-            <>
-              <PageTitle title="Form Layout | TailAdmin - Tailwind CSS Admin Dashboard Template" />
-              <FormLayout />
-            </>
-          }
-        />
-        <Route
-          path="/tables"
-          element={
-            <>
-              <PageTitle title="Tables | TailAdmin - Tailwind CSS Admin Dashboard Template" />
-              <Tables />
-            </>
-          }
-        />
-        <Route
-          path="/settings"
-          element={
-            <>
-              <PageTitle title="Settings | TailAdmin - Tailwind CSS Admin Dashboard Template" />
-              <Settings />
-            </>
-          }
-        />
-        <Route
-          path="/chart"
-          element={
-            <>
-              <PageTitle title="Basic Chart | TailAdmin - Tailwind CSS Admin Dashboard Template" />
-              <Chart />
-            </>
-          }
-        />
-        <Route
-          path="/clientList"
-          element={
-            <>
-              <PageTitle title="Basic Chart | TailAdmin - Tailwind CSS Admin Dashboard Template" />
-              <ClientList />
-            </>
-          }
-        />
-
-        <Route
-          path="/addstaff"
-          element={
-            <>
-              <PageTitle title="Basic Chart | TailAdmin - Tailwind CSS Admin Dashboard Template" />
-              <AddStaff />
-            </>
-          }
-        />
-
-        <Route
-          path="/addTask"
-          element={
-            <>
-              <PageTitle title="Basic Chart | TailAdmin - Tailwind CSS Admin Dashboard Template" />
-              <AddTask />
-            </>
-          }
-        />
-        <Route
-          path="/ui/alerts"
-          element={
-            <>
-              <PageTitle title="Alerts | TailAdmin - Tailwind CSS Admin Dashboard Template" />
-              <Alerts />
-            </>
-          }
-        />
-        <Route
-          path="/ui/buttons"
-          element={
-            <>
-              <PageTitle title="Buttons | TailAdmin - Tailwind CSS Admin Dashboard Template" />
-              <Buttons />
-            </>
-          }
-        />
-        <Route
           path="/auth/signin"
-          element={
-            <>
-              <PageTitle title="Signin | TailAdmin - Tailwind CSS Admin Dashboard Template" />
-              <SignIn />
-            </>
-          }
+          element={<SignIn onLoginSuccess={handleLoginSuccess} />}
         />
-        <Route
-          path="/auth/signup"
-          element={
-            <>
-              <PageTitle title="Signup | TailAdmin - Tailwind CSS Admin Dashboard Template" />
-              <SignUp />
-            </>
-          }
-        />
-
-        <Route
-          path="/auth/signin"
-          element={
-            <>
-              <PageTitle title="Signin | TailAdmin - Tailwind CSS Admin Dashboard Template" />
-              <SignIn />
-            </>
-          }
-        />
+        
+        {isLoggedIn ? (
+          <Route element={<DefaultLayout />}>
+            <Route index element={<Dashboard />} />
+            {routes.map((route, index) => {
+              const { path, component: Component } = route;
+              return (
+                <Route
+                  key={index}
+                  path={path}
+                  element={
+                    <Suspense fallback={<Loader />}>
+                      <Component />
+                    </Suspense>
+                  }
+                />
+              );
+            })}
+          </Route>
+        ) : (
+          <Route
+            index
+            element={<SignIn onLoginSuccess={handleLoginSuccess} />}
+          />
+        )}
+        <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </>
   );
