@@ -1,6 +1,6 @@
 projects:
   supremesecurity:
-    schemaPath: src/graphql/schema.json
+    schemaPath:  amplify/backend/api/supremesecurity/src/graphql/schema.json
     includes:
       - src/graphql/**/*.js
     excludes:
