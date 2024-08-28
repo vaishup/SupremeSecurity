@@ -1,0 +1,32 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-supremesecurity-dev-2ffdf-authRole",
+      "UnauthRoleArn": "arn:aws:iam::430118821240:role/amplify-supremesecurity-dev-2ffdf-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::430118821240:role/amplify-supremesecurity-dev-2ffdf-authRole",
+      "Region": "us-east-2",
+      "DeploymentBucketName": "amplify-supremesecurity-dev-2ffdf-deployment",
+      "UnauthRoleName": "amplify-supremesecurity-dev-2ffdf-unauthRole",
+      "StackName": "amplify-supremesecurity-dev-2ffdf",
+      "StackId": "arn:aws:cloudformation:us-east-2:430118821240:stack/amplify-supremesecurity-dev-2ffdf/a89847b0-5d00-11ef-98c4-028010521f9b",
+      "AmplifyAppId": "d3s3zcgi5i37nj"
+    },
+    "categories": {
+      "auth": {
+        "supremesecurity68d0a54f": {}
+      },
+      "function": {
+        "CreateStaffLogin": {
+          "deploymentBucketName": "amplify-supremesecurity-dev-2ffdf-deployment",
+          "s3Key": "amplify-builds/CreateStaffLogin-656344504775386c4970-build.zip"
+        }
+      },
+      "api": {
+        "supremesecurity": {}
+      },
+      "storage": {
+        "supremesecurity": {}
+      }
+    }
+  }
+}

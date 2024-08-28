@@ -1,0 +1,66 @@
+type theClient @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  name: String!
+  phoneno: String
+  bname: String
+  email: String
+  contactpersonpho: String
+  address: String
+  note: String
+  attachments: [String]
+  thestaffID: ID @index(name: "bytheStaff")
+  thestaffs: [theStaff] @manyToMany(relationName: "theStafftheClient")
+  theIncidents: theIncidents @belongsTo
+  TaskID: [Task] @hasMany(indexName: "Task", fields: ["id"])
+}
+
+type theStaff @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  fname: String!
+  phoneno: String
+  lname: String
+  email: String
+  joiningdate: String
+  address: String
+  theClients: [theClient] @hasMany(indexName: "bytheStaff", fields: ["id"])
+  clientIds: [String]
+  theClient: [theClient] @manyToMany(relationName: "theStafftheClient")
+}
+
+type Task @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  title: String!
+  description: String
+  frequency: String
+  theClient: theClient @hasOne
+  clientId: String
+  bytheClientID: ID @index(name: "byTheClientId", queryField: "tasksByClientId")
+}
+
+
+
+type theIncidents @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  title: String!
+  description: String
+  clientid: String
+  address: String
+  attachments: [String]
+  conversationHistory: AWSJSON
+  status: String
+  comments: String
+  theStaff: theStaff @hasOne
+  staffid: String
+  dateTime: String
+  theClient: theClient @hasOne
+  bytheClientID: theClient @hasOne
+}
+
+type user @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  name: String
+  email: String
+  phoneNo: String
+  userType: String
+}
+ 

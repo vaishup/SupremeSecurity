@@ -1,5 +1,5 @@
-import { signUp, signIn, fetchUserAttributes } from '@aws-amplify/auth';
-import { generateClient } from '@aws-amplify/api';
+import { signUp, signIn, fetchUserAttributes } from "@aws-amplify/auth";
+import { generateClient } from "@aws-amplify/api";
 const client = generateClient();
 
 type SignUpParam = {
@@ -28,7 +28,7 @@ export async function signUpUser({ username, password, email, phone_number }) {
 
     return signUpResponse;
   } catch (error) {
-    console.error('Error signing up:', error);
+    console.error("Error signing up:", error);
     throw error;
   }
 }
@@ -36,8 +36,7 @@ export async function signUpUser({ username, password, email, phone_number }) {
 export async function getTableID() {
   try {
     const user = await fetchUserAttributes();
-
-    return user['custom:TableID'];
+    return user["custom:TableID"];
   } catch (err) {
     console.log(err);
   }
@@ -46,15 +45,14 @@ export async function getTableID() {
 export async function getCustomAttributes() {
   try {
     const user = await fetchUserAttributes();
-    const tableID = user['custom:TableID'];
-    const userType = user['custom:userType'];
+    const tableID = user["custom:TableID"];
 
     return {
       tableID,
-      userType,
+
     };
   } catch (err) {
-    console.log('Error fetching custom attributes:', err);
+    console.log("Error fetching custom attributes:", err);
     throw err;
   }
 }
@@ -62,7 +60,7 @@ export async function getCustomAttributes() {
 export async function getUserInfo() {
   try {
     const user = await fetchUserAttributes();
-    const tableID = user['custom:TableID'];
+    const tableID = user["custom:TableID"];
 
     const userInfo = `
     query MyQuery($id:ID!){
@@ -83,7 +81,7 @@ export async function getUserInfo() {
     const { getUsers } = data;
     return getUsers;
   } catch (err) {
-    console.log('err in getUserInfo...', err);
+    console.log("err in getUserInfo...", err);
   }
 }
 
@@ -110,7 +108,7 @@ export async function getOtherUserInfo(userId: string) {
     const { getUsers } = data;
     return getUsers;
   } catch (err) {
-    console.log('err in getUserInfo...', err);
+    console.log("err in getUserInfo...", err);
   }
 }
 
@@ -118,11 +116,11 @@ export async function getOtherUserInfo(userId: string) {
 export async function getLicenseInfoByUserId() {
   try {
     const user = await fetchUserAttributes();
-    const tableID = user['custom:TableID'];
+    const tableID = user["custom:TableID"];
     const query = `
     `;
   } catch (Err) {
-    console.error('error in getUserLicenseInfo....', Err);
+    console.error("error in getUserLicenseInfo....", Err);
   }
 }
 
@@ -148,6 +146,6 @@ export async function getPhramacyByUserId(userId: string) {
     });
     return driverDetail?.data.getPharmacyUser;
   } catch (err) {
-    console.log('err...', err);
+    console.log("err...", err);
   }
 }

@@ -3,113 +3,127 @@ import Breadcrumb from "../../components/Breadcrumbs/Breadcrumb";
 import LogoDark from "../../images/logo/sss.jpeg";
 import Logo from "../../images/logo/logo.svg";
 import DefaultLayout from "../../layout/DefaultLayout";
-import { signUp } from "aws-amplify/auth"
-import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { signUp } from "aws-amplify/auth";
+import React, { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
+import { generateClient } from "aws-amplify/api";
+import * as mutation from "../../graphql/mutations";
 
-import { getCustomAttributes } from '../../hooks/authServices';
+import { getCustomAttributes } from "../../hooks/authServices";
 import {
   signIn,
   confirmSignUp,
   signOut,
   getCurrentUser,
   updateUserAttribute,
-} from 'aws-amplify/auth';
+} from "aws-amplify/auth";
 interface SignInProps {
   onLoginSuccess: () => void;
 }
 const SignIn: React.FC<SignInProps> = ({ onLoginSuccess }) => {
   const navigate = useNavigate();
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const [errorMsg, setErrorMsg] = useState();
-//   const handleClickSignup = async () => {
-//     console.log("tesr");
-    
-//   const { isSignUpComplete, userId, nextStep } = await signUp({
-//     username: "hello@mycompany.com",
-//     password: "hunter2",
-//     options: {
-//       userAttributes: {
-//         email: "hello@mycompany.com",
-//         phone_number: "+6476419995" // E.164 number convention
-//       },
-//     }
-//   });
-// }
-const handleLogout = async () => {
-  try {
-    const response = await signOut();
-    console.log('signout response ', response);
-    localStorage.removeItem('loginTimestamp');
-    navigate('/auth/signin');
-  } catch (error) {
-    console.log('error signing out: ', error);
-  }
-};
-const handleClickSignup = async (event) => {
-  event.preventDefault(); // Prevents page reload
-  console.log("test");
+  //   const handleClickSignup = async () => {
+  //     console.log("tesr");
 
-  try {
-    const { isSignUpComplete, userId, nextStep } = await signUp({
-          username: "vaishalipanchal6899@gmail.com",
-          password: "V@ishu6899",
-          options: {
-            userAttributes: {
-              email: "vaishalipanchal6899@Gmail.com",
-              phone_number: "+6476419995" // E.164 number convention
-            },
-          }
-        });
-  } catch (error) {
-    console.log('Error signing up:', error);
-  }
-};
+  //   const { isSignUpComplete, userId, nextStep } = await signUp({
+  //     username: "hello@mycompany.com",
+  //     password: "hunter2",
+  //     options: {
+  //       userAttributes: {
+  //         email: "hello@mycompany.com",
+  //         phone_number: "+6476419995" // E.164 number convention
+  //       },
+  //     }
+  //   });
+  // }
+  const API = generateClient();
 
+  const handleLogout = async () => {
+    try {
+      const response = await signOut();
+      console.log("signout response ", response);
+      localStorage.removeItem("loginTimestamp");
+      navigate("/auth/signin");
+    } catch (error) {
+      console.log("error signing out: ", error);
+    }
+  };
+  const handleClickSignup = async (event) => {
+    event.preventDefault(); // Prevents page reload
+    console.log("test");
 
-const handleConfirmSignup= async (event) => {
-  event.preventDefault(); // Prevents page reload
-  console.log("test");
+    try {
+      const { isSignUpComplete, userId, nextStep } = await signUp({
+        username: "supremesecurity",
+        password: "Abc@123456",
 
-  try {
-    const { isSignUpComplete, nextStep } = await confirmSignUp({
-      username: "vaishalipanchal6899@Gmail.com",
-      confirmationCode: "994016"
-    });
-  } catch (error) {
-    console.log('Error signing up:', error);
-  }
-};
+        options: {
+          userAttributes: {
+            email: "vaishalipanchal6899@gmail.com",
+            phone_number: "+6476419995", // E.164 number convention
+          },
+        },
+      });
+    } catch (error) {
+      console.log("Error signing up:", error);
+    }
+  };
 
+  const handleConfirmSignup = async (event) => {
+    event.preventDefault(); // Prevents page reload
+    try {
+      const { isSignUpComplete, nextStep } = await confirmSignUp({
+        username: "supremesecurity",
+        confirmationCode: "585603",
+      });
 
+      const newUser = {
+        //  id: generateUniqueId(), // Generate unique ID here
+        name: "supremesecurity",
+        email: "vaishalipanchal6899@gmail.com",
 
-  const handleClickSignIn= async (event) => {
+        phoneNo: "+16476419995",
+        userType: "admin",
+      };
+
+      // Call the createPharmacy mutation
+      const res = await API.graphql({
+        query: mutation.createUser,
+        variables: { input: newUser },
+      });
+      console.log("res", res);
+    } catch (error) {
+      console.log("Error signing up:", error);
+    }
+  };
+
+  const handleClickSignIn = async (event) => {
     event.preventDefault();
-    console.log('username: ', username, ', password: ', password);
+    console.log("username: ", username, ", password: ", password);
     try {
       const { isSignedIn, nextStep } = await signIn({
         username: username,
         password: password,
       });
 
-      console.log('Signed', isSignedIn);
+      console.log("Signed", isSignedIn);
 
-      const { tableID, userType } = await getCustomAttributes();
-      console.log('userType', userType);
-      console.log('userType', tableID);
+      const { tableID } = await getCustomAttributes();
+      console.log("userType", tableID);
 
       isSignedIn && onLoginSuccess();
       // isSignedIn && onLoginSuccess();
     } catch (error) {
-      console.log('error signing in', error);
+      console.log("error signing in", error);
       // 'Invalid username or password'
       setErrorMsg(error.message);
     }
-
   };
   useEffect(() => {
-  handleLogout()
+    handleLogout();
   }, []);
 
   return (
@@ -137,7 +151,7 @@ const handleConfirmSignup= async (event) => {
                   </label>
                   <div className="relative">
                     <input
-                      type="email"
+                      type="text"
                       value={username}
                       onChange={(e) => setUsername(e.target.value)}
                       placeholder="Enter your email"
@@ -170,8 +184,8 @@ const handleConfirmSignup= async (event) => {
                   </label>
                   <div className="relative">
                     <input
-                           value={password}
-                           onChange={(e) => setPassword(e.target.value)}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
                       type="password"
                       placeholder="6+ Characters, 1 Capital letter"
                       className="w-full rounded-lg border border-stroke bg-transparent py-4 pl-6 pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
@@ -187,7 +201,7 @@ const handleConfirmSignup= async (event) => {
                   />
                 </div>
 
-                <div className="mt-6 text-center" >
+                <div className="mt-6 text-center">
                   <p>
                     Don’t have any account?{" "}
                     <Link to="/auth/signup" className="text-primary">

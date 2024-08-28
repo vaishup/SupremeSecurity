@@ -1,0 +1,23 @@
+{
+  "Records": [
+    {
+      "eventName": "INSERT",
+      "dynamodb": {
+        "NewImage": {
+          "email": {
+            "S": "john@example.com"
+          },
+          "fname": {
+            "S": "bob"
+          },
+           "lname": {
+            "S": "smith"
+          },
+          "id": {
+            "S": "b0d7e9dd-d757-4b16-a9d1-93b70ddb8679"
+          }
+        }
+      }
+    }
+  ]
+}

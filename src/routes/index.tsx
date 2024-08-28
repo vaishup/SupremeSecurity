@@ -11,6 +11,10 @@ const StaffList = lazy(() => import('../pages/StaffList'));
 const TaskList = lazy(() => import('../pages/TaskList'));
 const ClientList = lazy(() => import('../pages/ClientList'));
 const IncidenetsList = lazy(() => import('../pages/IncidenetsList'));
+const IncidentDetail = lazy(() => import('../pages/IncidentDetail'));
+const ClientDetails = lazy(() => import('../pages/ClientDetails'))
+const AddIncident = lazy(() => import('../pages/AddIncident'))
+
 
 
 const coreRoutes = [
@@ -21,17 +25,17 @@ const coreRoutes = [
   },
 
   {
-    path: '/addclient',
+    path: '/addclient/:id?',
     title: 'AddClient',
     component: AddClient,
   },
   {
-    path: '/addTask',
+    path: '/addTask/:id?/:clientid?',
     title: 'AddTask',
     component: AddTask,
   },
   {
-    path: '/addStaff',
+    path: '/addStaff/:id?',
     title: 'AddStaff',
     component: AddStaff,
   },
@@ -54,6 +58,26 @@ const coreRoutes = [
     path: '/incidenetsList',
     title: 'IncidenetsList',
     component: IncidenetsList,
+  },
+  {
+    path: '/clientdetail/:id?',
+    title: 'ClientDetail',
+    component: ClientDetails,
+  },
+  {
+    path: '/incidenetsList',
+    title: 'IncidentDetail',
+    component: IncidentDetail,
+  },
+  {
+    path: '/addIncident/:id?',
+    title: 'AddIncident',
+    component: AddIncident,
+  },
+  {
+    path: '/addIncident/:id?',
+    title: 'AddIncident',
+    component: AddIncident,
   },
 ];
 

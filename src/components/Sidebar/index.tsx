@@ -1,9 +1,19 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
-import SidebarLinkGroup from './SidebarLinkGroup';
-import Logo from '../../images/logo/sss.jpeg';
-import { Car, Package, PillIcon, BriefcaseMedicalIcon, UserRound, UsersRound, ClipboardList, SquareUser } from 'lucide-react';
-import { colors } from '../../styles/colors';
+import React, { useEffect, useRef, useState } from "react";
+import { NavLink, useLocation } from "react-router-dom";
+import SidebarLinkGroup from "./SidebarLinkGroup";
+import Logo from "../../images/logo/sss.jpeg";
+import {
+  Car,
+  Package,
+  PillIcon,
+  BriefcaseMedicalIcon,
+  UserRound,
+  UsersRound,
+  ClipboardList,
+  SquareUser,
+} from "lucide-react";
+import { colors } from "../../styles/colors";
+import { useNavigate } from "react-router-dom";
 
 interface SidebarProps {
   sidebarOpen: boolean;
@@ -13,13 +23,11 @@ interface SidebarProps {
 const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
   const location = useLocation();
   const { pathname } = location;
-
   const trigger = useRef<any>(null);
   const sidebar = useRef<any>(null);
-
-  const storedSidebarExpanded = localStorage.getItem('sidebar-expanded');
+  const storedSidebarExpanded = localStorage.getItem("sidebar-expanded");
   const [sidebarExpanded, setSidebarExpanded] = useState(
-    storedSidebarExpanded === null ? false : storedSidebarExpanded === 'true',
+    storedSidebarExpanded === null ? false : storedSidebarExpanded === "true"
   );
 
   // close on click outside
@@ -34,8 +42,8 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
         return;
       setSidebarOpen(false);
     };
-    document.addEventListener('click', clickHandler);
-    return () => document.removeEventListener('click', clickHandler);
+    document.addEventListener("click", clickHandler);
+    return () => document.removeEventListener("click", clickHandler);
   });
 
   // close if the esc key is pressed
@@ -44,16 +52,16 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
       if (!sidebarOpen || keyCode !== 27) return;
       setSidebarOpen(false);
     };
-    document.addEventListener('keydown', keyHandler);
-    return () => document.removeEventListener('keydown', keyHandler);
+    document.addEventListener("keydown", keyHandler);
+    return () => document.removeEventListener("keydown", keyHandler);
   });
 
   useEffect(() => {
-    localStorage.setItem('sidebar-expanded', sidebarExpanded.toString());
+    localStorage.setItem("sidebar-expanded", sidebarExpanded.toString());
     if (sidebarExpanded) {
-      document.querySelector('body')?.classList.add('sidebar-expanded');
+      document.querySelector("body")?.classList.add("sidebar-expanded");
     } else {
-      document.querySelector('body')?.classList.remove('sidebar-expanded');
+      document.querySelector("body")?.classList.remove("sidebar-expanded");
     }
   }, [sidebarExpanded]);
 
@@ -61,7 +69,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
     <aside
       ref={sidebar}
       className={`absolute left-0 top-0 z-9999 flex h-screen w-72.5 flex-col overflow-y-hidden bg-[white]  duration-300 ease-linear dark:bg-boxdark lg:static lg:translate-x-0 ${
-        sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+        sidebarOpen ? "translate-x-0" : "-translate-x-full"
       }`}
     >
       {/* <!-- SIDEBAR HEADER --> */}
@@ -108,16 +116,16 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                 <NavLink
                   to="/"
                   className={`group relative flex items-center gap-2.5 rounded-lg py-2 px-4 font-medium text-black duration-300 ease-in-out hover:bg-black dark:hover:bg-meta-4 ${
-                    (pathname === '#' || pathname.includes('#')) &&
-                    'bg-graydark dark:bg-meta-4'
+                    (pathname === "#" || pathname.includes("#")) &&
+                    "bg-graydark dark:bg-meta-4"
                   }`}
                   onMouseOver={(e) => {
-                    e.currentTarget.style.backgroundColor = '#531413';
-                    e.currentTarget.style.color = 'white';
+                    e.currentTarget.style.backgroundColor = "#531413";
+                    e.currentTarget.style.color = "white";
                   }}
                   onMouseOut={(e) => {
-                    e.currentTarget.style.backgroundColor = 'transparent';
-                    e.currentTarget.style.color = 'black';
+                    e.currentTarget.style.backgroundColor = "transparent";
+                    e.currentTarget.style.color = "black";
                   }}
                 >
                   <svg
@@ -151,81 +159,83 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
               {/* <!-- Menu Item Dashboard --> */}
 
               <SidebarLinkGroup
-  activeCondition={pathname === '/clientlist' || pathname.includes('')}
->
-  {(handleClick, open) => {
-    return (
-      <React.Fragment>
-        <NavLink
-          to="/clientlist"
-          className={`group relative flex items-center gap-2.5 rounded-md py-2 px-4 font-medium text-black duration-300 ease-in-out hover:bg-black dark:hover:bg-meta-4 ${
-            (pathname === '/clientlist' ||
-              pathname.includes('clientlist')) &&
-            'bg-[#531413] text-white dark:bg-white'
-          }`}
-          onMouseOver={(e) => {
-            e.currentTarget.style.backgroundColor = '#531413';
-            e.currentTarget.style.color = 'white';
-          }}
-          onMouseOut={(e) => {
-            e.currentTarget.style.backgroundColor = 'transparent';
-            e.currentTarget.style.color = 'black';
-          }}
-          onClick={() => {
-            handleClick(); // If you need to toggle the dropdown
-          }}
-        >
-          <UsersRound width={18} height={18} />
-          Clients
-          <svg
-            className={`absolute right-4 top-1/2 -translate-y-1/2 fill-current ${
-              open && 'rotate-180'
-            }`}
-            width="20"
-            height="20"
-            viewBox="0 0 20 20"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              fillRule="evenodd"
-              clipRule="evenodd"
-              d="M4.41107 6.9107C4.73651 6.58527 5.26414 6.58527 5.58958 6.9107L10.0003 11.3214L14.4111 6.91071C14.7365 6.58527 15.2641 6.58527 15.5896 6.91071C15.915 7.23614 15.915 7.76378 15.5896 8.08922L10.5896 13.0892C10.2641 13.4147 9.73651 13.4147 9.41107 13.0892L4.41107 8.08922C4.08563 7.76378 4.08563 7.23614 4.41107 6.9107Z"
-              fill=""
-            />
-          </svg>
-        </NavLink>
-                    {/* Dropdown Menu Start */}
+                activeCondition={
+                  pathname === "/clientlist" || pathname.includes("")
+                }
+              >
+                {(handleClick, open) => {
+                  return (
+                    <React.Fragment>
+                      <NavLink
+                        to="/clientlist"
+                        className={`group relative flex items-center gap-2.5 rounded-md py-2 px-4 font-medium text-black duration-300 ease-in-out hover:bg-black dark:hover:bg-meta-4 ${
+                          (pathname === "/clientlist" ||
+                            pathname.includes("clientlist")) &&
+                          "bg-[#531413] text-white dark:bg-white"
+                        }`}
+                        onMouseOver={(e) => {
+                          e.currentTarget.style.backgroundColor = "#531413";
+                          e.currentTarget.style.color = "white";
+                        }}
+                        onMouseOut={(e) => {
+                          e.currentTarget.style.backgroundColor = "transparent";
+                          e.currentTarget.style.color = "black";
+                        }}
+                        onClick={() => {
+                          handleClick(); // If you need to toggle the dropdown
+                        }}
+                      >
+                        <UsersRound width={18} height={18} />
+                        Clients
+                        <svg
+                          className={`absolute right-4 top-1/2 -translate-y-1/2 fill-current ${
+                            open && "rotate-180"
+                          }`}
+                          width="20"
+                          height="20"
+                          viewBox="0 0 20 20"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            clipRule="evenodd"
+                            d="M4.41107 6.9107C4.73651 6.58527 5.26414 6.58527 5.58958 6.9107L10.0003 11.3214L14.4111 6.91071C14.7365 6.58527 15.2641 6.58527 15.5896 6.91071C15.915 7.23614 15.915 7.76378 15.5896 8.08922L10.5896 13.0892C10.2641 13.4147 9.73651 13.4147 9.41107 13.0892L4.41107 8.08922C4.08563 7.76378 4.08563 7.23614 4.41107 6.9107Z"
+                            fill=""
+                          />
+                        </svg>
+                      </NavLink>
+                      {/* Dropdown Menu Start */}
                       <div
-                        className={`  transform overflow-hidden ${!open && 'hidden'}`}
+                        className={`  transform overflow-hidden ${!open && "hidden"}`}
                       >
                         <ul className="mt-2 flex flex-col gap-2.5 pl-6">
                           <li>
                             <NavLink
                               to="/addclient"
                               className={`group relative flex items-center gap-2.5 rounded-md py-2 px-4 font-medium text-black duration-300 ease-in-out hover:bg-black dark:hover:bg-meta-4 ${
-                                pathname === '/addclient' &&
-                                'bg-primary text-white dark:bg-white'
+                                pathname === "/addclient" &&
+                                "bg-primary text-white dark:bg-white"
                               }`}
                               onMouseOver={(e) => {
                                 e.currentTarget.style.backgroundColor =
-                                  '#531413';
-                                e.currentTarget.style.color = 'white';
+                                  "#531413";
+                                e.currentTarget.style.color = "white";
                                 const img =
-                                  e.currentTarget.querySelector('img');
+                                  e.currentTarget.querySelector("img");
                                 if (img) {
                                   img.style.filter =
-                                    'invert(100%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(100%) contrast(100%)';
+                                    "invert(100%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(100%) contrast(100%)";
                                 }
                               }}
                               onMouseOut={(e) => {
                                 e.currentTarget.style.backgroundColor =
-                                  'transparent';
-                                e.currentTarget.style.color = 'black';
+                                  "transparent";
+                                e.currentTarget.style.color = "black";
                                 const img =
-                                  e.currentTarget.querySelector('img');
+                                  e.currentTarget.querySelector("img");
                                 if (img) {
-                                  img.style.filter = 'none';
+                                  img.style.filter = "none";
                                 }
                               }}
                             >
@@ -235,10 +245,10 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                                 width={18}
                                 height={18}
                               /> */}
-                             Add Client
+                              Add Client
                             </NavLink>
                           </li>
-                          </ul>
+                        </ul>
                       </div>
                       {/* <!-- Dropdown Menu End --> */}
                     </React.Fragment>
@@ -249,7 +259,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
 
               {/* <!-- Menu Item Deliveries --> */}
               <SidebarLinkGroup
-                activeCondition={pathname === '/' || pathname.includes('')}
+                activeCondition={pathname === "/" || pathname.includes("")}
               >
                 {(handleClick, open) => {
                   return (
@@ -257,16 +267,16 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                       <NavLink
                         to="/taskList"
                         className={`group relative flex items-center gap-2.5 rounded-lg py-2 px-4 font-medium text-black duration-300 ease-in-out hover:bg-black dark:hover:bg-meta-4 ${
-                          (pathname === '#' || pathname.includes('#')) &&
-                          'bg-primary text-white  dark:bg-meta-4'
+                          (pathname === "#" || pathname.includes("#")) &&
+                          "bg-primary text-white  dark:bg-meta-4"
                         }`}
                         onMouseOver={(e) => {
-                          e.currentTarget.style.backgroundColor = '#531413';
-                          e.currentTarget.style.color = 'white';
+                          e.currentTarget.style.backgroundColor = "#531413";
+                          e.currentTarget.style.color = "white";
                         }}
                         onMouseOut={(e) => {
-                          e.currentTarget.style.backgroundColor = 'transparent';
-                          e.currentTarget.style.color = 'black';
+                          e.currentTarget.style.backgroundColor = "transparent";
+                          e.currentTarget.style.color = "black";
                         }}
                       >
                         <ClipboardList width={18} height={18} />
@@ -295,17 +305,14 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                           </g>
                         </svg> */}
                         Tasks
-                       
                       </NavLink>
 
                       {/* <!-- Dropdown Menu Start --> */}
                       <div
                         className={`translate transform overflow-hidden ${
-                          !open && 'hidden'
+                          !open && "hidden"
                         }`}
-                      >
-                       
-                      </div>
+                      ></div>
                       {/* <!-- Dropdown Menu End --> */}
                     </React.Fragment>
                   );
@@ -320,16 +327,16 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                 <NavLink
                   to="/staffList"
                   className={`group relative flex items-center gap-2.5 rounded-lg py-2 px-4 font-medium text-black duration-300 ease-in-out hover:bg-black dark:hover:bg-meta-4 ${
-                    (pathname === '#' || pathname.includes('#')) &&
-                    'bg-primary dark:bg-meta-4'
+                    (pathname === "#" || pathname.includes("#")) &&
+                    "bg-primary dark:bg-meta-4"
                   }`}
                   onMouseOver={(e) => {
-                    e.currentTarget.style.backgroundColor = '#531413';
-                    e.currentTarget.style.color = 'white';
+                    e.currentTarget.style.backgroundColor = "#531413";
+                    e.currentTarget.style.color = "white";
                   }}
                   onMouseOut={(e) => {
-                    e.currentTarget.style.backgroundColor = 'transparent';
-                    e.currentTarget.style.color = 'black';
+                    e.currentTarget.style.backgroundColor = "transparent";
+                    e.currentTarget.style.color = "black";
                   }}
                 >
                   <SquareUser width={18} height={18} />
@@ -360,22 +367,21 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
               {/* <!-- Menu Item Settings --> */}
               <li>
                 <NavLink
-                  to="/IncidenetsList"
+                  to="/incidenetsList"
                   className={`group relative flex items-center gap-2.5 rounded-lg py-2 px-4 font-medium text-black duration-300 ease-in-out hover:bg-black dark:hover:bg-meta-4 ${
-                    (pathname === '/IncidenetsList' ||
-                      pathname.includes('/IncidenetsList')) &&
-                    'bg-primary  text-white dark:bg-meta-4'
+                    (pathname === "/incidenetsList" ||
+                      pathname.includes("/incidenetsList")) &&
+                    "bg-primary  text-white dark:bg-meta-4"
                   }`}
                   onMouseOver={(e) => {
-                    e.currentTarget.style.backgroundColor = '#531413';
-                    e.currentTarget.style.color = 'white';
+                    e.currentTarget.style.backgroundColor = "#531413";
+                    e.currentTarget.style.color = "white";
                   }}
                   onMouseOut={(e) => {
-                    e.currentTarget.style.backgroundColor = 'transparent';
-                    e.currentTarget.style.color = 'black';
+                    e.currentTarget.style.backgroundColor = "transparent";
+                    e.currentTarget.style.color = "black";
                   }}
                 >
-                  
                   <svg
                     className="fill-current"
                     width="18"

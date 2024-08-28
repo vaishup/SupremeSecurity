@@ -103,7 +103,7 @@ const ClientList = () => {
       // const confirmed = window.confirm(
       //   "Are you sure you want to delete this item?"
       // );
-     // if (!confirmed) return;
+      // if (!confirmed) return;
 
       // Perform the delete mutation
       await client.graphql({
@@ -121,6 +121,7 @@ const ClientList = () => {
       console.error("Error deleting item:", error);
     }
   };
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     listClient();
@@ -137,19 +138,53 @@ const ClientList = () => {
       console.error("Error fetching driver details:", error);
     }
   };
-
+  const filteredClients = clientList.filter(
+    (client) =>
+      client.bname.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      client.phoneno.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      client.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      client.contactpersonpho
+        .toLowerCase()
+        .includes(searchQuery.toLowerCase()) ||
+      client.address.toLowerCase().includes(searchQuery.toLowerCase())
+  );
   return (
     <>
-   
-        <div className="flex items-center justify-between">
-          <h2 className="text-title-md2 font-semibold text-Sidebar dark:text-white">
-            Client List
-          </h2>
-
+      <div className="flex items-center justify-between">
+        <h2 className="text-title-md2 font-semibold text-Sidebar dark:text-white">
+          Client List
+        </h2>
+        <div className="flex flex-row">
+          <div className="relative w-[300px] mr-3">
+            <input
+              style={{ background: "#e0e0e0" }} // Lighter gray background
+              type="text"
+              placeholder="Search client by businessname/phone no/email..."
+              className="w-full pl-10 pr-3 py-2 rounded-[10px] bg-[#e0e0e0] text-gray-700 placeholder-gray-500 shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all duration-300 ease-in-out"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+            <span className="absolute inset-y-0 left-3 flex items-center">
+              <svg
+                className="h-5 w-5 text-gray-500"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M21 21l-4.35-4.35m1.2-4.95a7.5 7.5 0 11-15 0 7.5 7.5 0 0115 0z"
+                />
+              </svg>
+            </span>
+          </div>
           <button
             className="btn-grad w-[180px] pr-20"
             onClick={() => {
-              navigation("/addclient");
+              navigation("/clientdetail");
             }}
           >
             <svg
@@ -169,73 +204,81 @@ const ClientList = () => {
             Add New Client
           </button>
         </div>
+      </div>
 
-        <div className="overflow-x-auto mt-10">
-          <table className="min-w-full bg-white rounded-lg shadow overflow-hidden">
-            <thead className="bg-gradient-to-r from-[#7a2828] to-[#a73737]">
-              <tr>
-                <th className="px-6 py-3 border-b border-gray-200 text-white text-left text-sm uppercase font-bold">
-                  Name
-                </th>
-                <th className="px-6 py-3 border-b border-gray-200 text-white text-left text-sm uppercase font-bold">
-                  PHONE NO
-                </th>
-                <th className="px-6 py-3 border-b border-gray-200 text-white text-left text-sm uppercase font-bold">
-                  EMAIL
-                </th>
-                <th className="px-6 py-3 border-b border-gray-200 text-white text-left text-sm uppercase font-bold">
-                  Contact Phone
-                </th>
-                <th className="px-6 py-3 border-b border-gray-200 text-white text-left text-sm uppercase font-bold">
-                  Address
-                </th>
-                <th className="px-6 py-3 border-b border-gray-200 text-white text-left text-sm uppercase font-bold">
-                  Action
-                </th>
+      <div className="overflow-x-auto mt-10">
+        <table className="min-w-full bg-white rounded-lg shadow overflow-hidden">
+          <thead className="bg-gradient-to-r from-[#7a2828] to-[#a73737]">
+            <tr>
+              <th className="px-6 py-3 border-b border-gray-200 text-white text-left text-sm uppercase font-bold">
+                Business Name
+              </th>
+              <th className="px-6 py-3 border-b border-gray-200 text-white text-left text-sm uppercase font-bold">
+                PHONE NO
+              </th>
+              <th className="px-6 py-3 border-b border-gray-200 text-white text-left text-sm uppercase font-bold">
+                EMAIL
+              </th>
+              <th className="px-6 py-3 border-b border-gray-200 text-white text-left text-sm uppercase font-bold">
+                Contact Phone
+              </th>
+              <th className="px-6 py-3 border-b border-gray-200 text-white text-left text-sm uppercase font-bold">
+                Address
+              </th>
+              <th className="px-6 py-3 border-b border-gray-200 text-white text-left text-sm uppercase font-bold">
+                Action
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredClients.map((order) => (
+              <tr key={order.id}>
+                <td className="px-6 py-4 border-b border-gray-200 bg-white text-sm">
+  <a
+    href={`/clientdetail/${order.id}`}
+    target="_blank"
+    rel="noopener noreferrer"
+    className="text-blue-600 underline"
+  >
+    {order.bname}
+  </a>
+</td>
+
+                <td className="px-6 py-4 border-b border-gray-200 bg-white text-sm">
+                  {order.phoneno}
+                </td>
+                <td className="px-6 py-4 border-b border-gray-200 bg-white text-sm">
+                  {order.email}
+                </td>
+                <td className="px-6 py-4 border-b border-gray-200 bg-white text-sm">
+                  {order.contactpersonpho}
+                </td>
+                <td className="px-6 py-4 border-b border-gray-200 bg-white text-sm">
+                  {order.address}
+                </td>
+                <td className="px-6 py-4 border-b border-gray-200 bg-white text-sm flex-row">
+                  <div className="flex flex-row">
+                    <PencilIcon
+                      onClick={() => {
+                        navigation(`/addclient/${order.id}`); // Navigate to AddStaff page with the staff ID
+                      }}
+                      className="mr-5 inline-block transition duration-300 ease-in-out transform hover:text-red-600 hover:scale-110"
+                      color="blue"
+                      size={20}
+                    />
+                    <Trash2
+                      onClick={() => handleDelete(order.id)}
+                      className="inline-block transition duration-300 ease-in-out transform hover:text-red-600 hover:scale-110"
+                      color="red"
+                      size={20}
+                    />
+                  </div>
+                </td>
               </tr>
-            </thead>
-            <tbody>
-              {clientList.map((order) => (
-                <tr key={order.id}>
-                  <td className="px-6 py-4 border-b border-gray-200 bg-white text-sm">
-                    {order.name}
-                  </td>
-                  <td className="px-6 py-4 border-b border-gray-200 bg-white text-sm">
-                    {order.phoneno}
-                  </td>
-                  <td className="px-6 py-4 border-b border-gray-200 bg-white text-sm">
-                    {order.email}
-                  </td>
-                  <td className="px-6 py-4 border-b border-gray-200 bg-white text-sm">
-                    {order.contactpersonpho}
-                  </td>
-                  <td className="px-6 py-4 border-b border-gray-200 bg-white text-sm">
-                    {order.address}
-                  </td>
-                  <td className="px-6 py-4 border-b border-gray-200 bg-white text-sm flex-row">
-                    <div className="flex flex-row">
-                      <PencilIcon
-                        onClick={() => {
-                          navigation(`/addclient/${order.id}`); // Navigate to AddStaff page with the staff ID
-                        }}
-                        className="mr-5 inline-block transition duration-300 ease-in-out transform hover:text-red-600 hover:scale-110"
-                        color="blue"
-                        size={20}
-                      />
-                      <Trash2
-                        onClick={() => handleDelete(order.id)}
-                        className="inline-block transition duration-300 ease-in-out transform hover:text-red-600 hover:scale-110"
-                        color="red"
-                        size={20}
-                      />
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-     
+            ))}
+          </tbody>
+        </table>
+      </div>
     </>
   );
 };
