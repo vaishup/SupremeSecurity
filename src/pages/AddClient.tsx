@@ -545,7 +545,7 @@ const AddClient = () => {
   <input
     type="file"
     multiple
-    onChange={handleFileChange}
+    onChange={handleFileChanges}
     className="w-full rounded border-[1.5px] border-stroke bg-transparent py-2 px-4 text-black outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
   />
   {errors.fileUpload && (
@@ -564,7 +564,7 @@ const AddClient = () => {
             className="rounded border border-gray-300"
           />
         ) : (
-          <div className="flex items-center justify-center w-28 h-28 bg-gray-200 border border-gray-300 rounded">
+          <div className="flex flex-col items-center justify-center w-28 h-28 bg-gray-200  rounded">
            <img src={UserOne} alt="User" width={80}height={80} />
 
             <p className="text-xs mt-2">{preview.name}</p>
