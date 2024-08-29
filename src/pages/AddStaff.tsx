@@ -1,13 +1,13 @@
-import Breadcrumb from "../components/Breadcrumbs/Breadcrumb";
-import DefaultLayout from "../layout/DefaultLayout";
-import { generateClient } from "aws-amplify/api";
-import React, { useState, useEffect, useRef } from "react";
-import { useParams, useNavigate } from "react-router-dom"; // Import hooks from react-router-dom
-import { getTheStaff, listTheStaffs } from "../graphql/queries";
-import { Modal } from "antd";
-import { Check } from "lucide-react";
-import UpdateModal from "../components/modal/UpdateModal.js";
-import * as mutation from "../graphql/mutations.js";
+import Breadcrumb from '../components/Breadcrumbs/Breadcrumb';
+import DefaultLayout from '../layout/DefaultLayout';
+import { generateClient } from 'aws-amplify/api';
+import React, { useState, useEffect, useRef } from 'react';
+import { useParams, useNavigate } from 'react-router-dom'; // Import hooks from react-router-dom
+import { getTheStaff, listTheStaffs } from '../graphql/queries';
+import { Modal } from 'antd';
+import { Check } from 'lucide-react';
+import UpdateModal from '../components/modal/UpdateModal.js';
+import * as mutation from '../graphql/mutations.js';
 import { DatePicker } from 'antd';
 import dayjs from 'dayjs';
 
@@ -15,28 +15,30 @@ const AddStaff = () => {
   const navigation = useNavigate();
   const API = generateClient();
   const { id } = useParams(); // Get the staff ID from the URL, if it exists
+  console.log('ids', id);
+
   // State to manage form inputs
   const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    phoneNumber: "",
-    joiningDate: "",
-    userName: "",
+    firstName: '',
+    lastName: '',
+    email: '',
+    phoneNumber: '',
+    joiningDate: '',
+    userName: '',
   });
 
   useEffect(() => {
     if (id) {
       const fetchStaffData = async () => {
         try {
-          console.log("Fetching staff with ID:", id); // Debug log
+          console.log('Fetching staff with ID:', id); // Debug log
           const staffData = await API.graphql({
             query: getTheStaff, // Replace with your actual query to get staff by ID
             variables: { id },
           });
 
           const staff = staffData.data.getTheStaff;
-          console.log("staff...s", staff);
+          console.log('staff...s', staff);
 
           setFormData({
             firstName: staff.fname,
@@ -47,7 +49,7 @@ const AddStaff = () => {
             userName: staff.userName,
           });
         } catch (error) {
-          console.error("Error fetching staff data:", error);
+          console.error('Error fetching staff data:', error);
         }
       };
 
@@ -81,10 +83,10 @@ const AddStaff = () => {
   // Validate form data
   const validate = () => {
     const errors = {};
-    if (!formData.firstName) errors.firstName = "First name is required";
-    if (!formData.lastName) errors.lastName = "Last name is required";
-    if (!formData.email) errors.email = "Email is required";
-    if (!formData.phoneNumber) errors.phoneNumber = "Phone number is required";
+    if (!formData.firstName) errors.firstName = 'First name is required';
+    if (!formData.lastName) errors.lastName = 'Last name is required';
+    if (!formData.email) errors.email = 'Email is required';
+    if (!formData.phoneNumber) errors.phoneNumber = 'Phone number is required';
     return errors;
   };
   const handleSubmit = async (e: React.FormEvent) => {
@@ -116,14 +118,14 @@ const AddStaff = () => {
         });
       }
       const createdItem = staffResponse.data.createTheStaff;
-      console.log(createdItem, "suceesfully created");
-      setId(createdItem.id)
+      console.log(createdItem.id, 'suceesfully created');
+      setId(createdItem.id);
       //navigation("/staffList");
-      setIsOpen(true)
+      setIsOpen(true);
       // Add logic here to submit the taskData to your backend or API
     } catch (error) {
-      console.error("Error creating PatientOrder:", error);
-      throw new Error("Failed to create PatientOrder");
+      console.error('Error creating PatientOrder:', error);
+      throw new Error('Failed to create PatientOrder');
     }
   };
   const [isOpen, setIsOpen] = useState(false);
@@ -134,7 +136,7 @@ const AddStaff = () => {
   };
   const handleCancle = () => {
     setIsOpen(false);
-    navigation("/stafflist");
+    navigation('/stafflist');
   };
   const disabledDate = (current) => {
     // Can not select days after today
@@ -196,7 +198,7 @@ const AddStaff = () => {
       </Modal>
 
       <Modal open={show} onCancel={handleCancle} footer={[]}>
-        <UpdateModal id={id} setIsShow={setIsShow} />
+        <UpdateModal id={ids} setIsShow={setIsShow} />
       </Modal>
       <Breadcrumb pageName="Add Staff" />
 
@@ -218,7 +220,7 @@ const AddStaff = () => {
                     placeholder="Enter your first name"
                     value={formData.firstName}
                     onChange={handleChange}
-                    className={`w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary ${errors.firstName ? "border-red-500" : ""} dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary`}
+                    className={`w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary ${errors.firstName ? 'border-red-500' : ''} dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary`}
                   />
                   {errors.firstName && (
                     <p className="text-red-500 text-sm mt-1">
@@ -237,7 +239,7 @@ const AddStaff = () => {
                     placeholder="Enter your last name"
                     value={formData.lastName}
                     onChange={handleChange}
-                    className={`w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary ${errors.lastName ? "border-red-500" : ""} dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary`}
+                    className={`w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary ${errors.lastName ? 'border-red-500' : ''} dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary`}
                   />
                   {errors.lastName && (
                     <p className="text-red-500 text-sm mt-1">
@@ -258,7 +260,7 @@ const AddStaff = () => {
                     placeholder="Enter your email address"
                     value={formData.email}
                     onChange={handleChange}
-                    className={`w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary ${errors.email ? "border-red-500" : ""} dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary`}
+                    className={`w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary ${errors.email ? 'border-red-500' : ''} dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary`}
                   />
                   {errors.email && (
                     <p className="text-red-500 text-sm mt-1">{errors.email}</p>
@@ -275,7 +277,7 @@ const AddStaff = () => {
                     placeholder="Enter your phone number"
                     value={formData.phoneNumber}
                     onChange={handleChange}
-                    className={`w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary ${errors.phoneNumber ? "border-red-500" : ""} dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary`}
+                    className={`w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary ${errors.phoneNumber ? 'border-red-500' : ''} dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary`}
                   />
                   {errors.phoneNumber && (
                     <p className="text-red-500 text-sm mt-1">
@@ -291,14 +293,13 @@ const AddStaff = () => {
                     Joining date
                   </label>
                   <DatePicker
-                          value={selectedDate} 
-
-                          placeholder="Enter joiningDate"
-                          className="w-full text-left rounded border border-stroke bg-gray py-3  pr-4.5 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white dark:focus:border-primary"
-                          format="YYYY-MM-DD"
-                          disabledDate={disabledDate}
-                          onChange={handleDateChange}
-                        />
+                    value={selectedDate}
+                    placeholder="Enter joiningDate"
+                    className="w-full text-left rounded border border-stroke bg-gray py-3  pr-4.5 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white dark:focus:border-primary"
+                    format="YYYY-MM-DD"
+                    disabledDate={disabledDate}
+                    onChange={handleDateChange}
+                  />
                   {/* <input
                     type="text"
                     name="joiningDate"

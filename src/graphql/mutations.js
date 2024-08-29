@@ -16,8 +16,8 @@ export const createTheClient = /* GraphQL */ `
       address
       note
       attachments
-      thestaffID
-      thestaffs {
+      staffids
+      theStaff {
         nextToken
         __typename
       }
@@ -62,8 +62,8 @@ export const updateTheClient = /* GraphQL */ `
       address
       note
       attachments
-      thestaffID
-      thestaffs {
+      staffids
+      theStaff {
         nextToken
         __typename
       }
@@ -108,8 +108,8 @@ export const deleteTheClient = /* GraphQL */ `
       address
       note
       attachments
-      thestaffID
-      thestaffs {
+      staffids
+      theStaff {
         nextToken
         __typename
       }
@@ -151,14 +151,23 @@ export const createTheStaff = /* GraphQL */ `
       lname
       email
       joiningdate
+      theClientID
       address
-      theClients {
-        nextToken
-        __typename
-      }
       clientIds
       theClient {
-        nextToken
+        id
+        name
+        phoneno
+        bname
+        email
+        contactpersonpho
+        address
+        note
+        attachments
+        staffids
+        createdAt
+        updatedAt
+        theClientTheIncidentsId
         __typename
       }
       createdAt
@@ -179,14 +188,23 @@ export const updateTheStaff = /* GraphQL */ `
       lname
       email
       joiningdate
+      theClientID
       address
-      theClients {
-        nextToken
-        __typename
-      }
       clientIds
       theClient {
-        nextToken
+        id
+        name
+        phoneno
+        bname
+        email
+        contactpersonpho
+        address
+        note
+        attachments
+        staffids
+        createdAt
+        updatedAt
+        theClientTheIncidentsId
         __typename
       }
       createdAt
@@ -207,14 +225,23 @@ export const deleteTheStaff = /* GraphQL */ `
       lname
       email
       joiningdate
+      theClientID
       address
-      theClients {
-        nextToken
-        __typename
-      }
       clientIds
       theClient {
-        nextToken
+        id
+        name
+        phoneno
+        bname
+        email
+        contactpersonpho
+        address
+        note
+        attachments
+        staffids
+        createdAt
+        updatedAt
+        theClientTheIncidentsId
         __typename
       }
       createdAt
@@ -243,7 +270,7 @@ export const createTask = /* GraphQL */ `
         address
         note
         attachments
-        thestaffID
+        staffids
         createdAt
         updatedAt
         theClientTheIncidentsId
@@ -277,7 +304,7 @@ export const updateTask = /* GraphQL */ `
         address
         note
         attachments
-        thestaffID
+        staffids
         createdAt
         updatedAt
         theClientTheIncidentsId
@@ -311,7 +338,7 @@ export const deleteTask = /* GraphQL */ `
         address
         note
         attachments
-        thestaffID
+        staffids
         createdAt
         updatedAt
         theClientTheIncidentsId
@@ -347,6 +374,7 @@ export const createTheIncidents = /* GraphQL */ `
         lname
         email
         joiningdate
+        theClientID
         address
         clientIds
         createdAt
@@ -365,7 +393,7 @@ export const createTheIncidents = /* GraphQL */ `
         address
         note
         attachments
-        thestaffID
+        staffids
         createdAt
         updatedAt
         theClientTheIncidentsId
@@ -381,7 +409,7 @@ export const createTheIncidents = /* GraphQL */ `
         address
         note
         attachments
-        thestaffID
+        staffids
         createdAt
         updatedAt
         theClientTheIncidentsId
@@ -418,6 +446,7 @@ export const updateTheIncidents = /* GraphQL */ `
         lname
         email
         joiningdate
+        theClientID
         address
         clientIds
         createdAt
@@ -436,7 +465,7 @@ export const updateTheIncidents = /* GraphQL */ `
         address
         note
         attachments
-        thestaffID
+        staffids
         createdAt
         updatedAt
         theClientTheIncidentsId
@@ -452,7 +481,7 @@ export const updateTheIncidents = /* GraphQL */ `
         address
         note
         attachments
-        thestaffID
+        staffids
         createdAt
         updatedAt
         theClientTheIncidentsId
@@ -489,6 +518,7 @@ export const deleteTheIncidents = /* GraphQL */ `
         lname
         email
         joiningdate
+        theClientID
         address
         clientIds
         createdAt
@@ -507,7 +537,7 @@ export const deleteTheIncidents = /* GraphQL */ `
         address
         note
         attachments
-        thestaffID
+        staffids
         createdAt
         updatedAt
         theClientTheIncidentsId
@@ -523,7 +553,7 @@ export const deleteTheIncidents = /* GraphQL */ `
         address
         note
         attachments
-        thestaffID
+        staffids
         createdAt
         updatedAt
         theClientTheIncidentsId
@@ -583,138 +613,6 @@ export const deleteUser = /* GraphQL */ `
       email
       phoneNo
       userType
-      createdAt
-      updatedAt
-      __typename
-    }
-  }
-`;
-export const createTheStafftheClient = /* GraphQL */ `
-  mutation CreateTheStafftheClient(
-    $input: CreateTheStafftheClientInput!
-    $condition: ModelTheStafftheClientConditionInput
-  ) {
-    createTheStafftheClient(input: $input, condition: $condition) {
-      id
-      theClientId
-      theStaffId
-      theClient {
-        id
-        name
-        phoneno
-        bname
-        email
-        contactpersonpho
-        address
-        note
-        attachments
-        thestaffID
-        createdAt
-        updatedAt
-        theClientTheIncidentsId
-        __typename
-      }
-      theStaff {
-        id
-        fname
-        phoneno
-        lname
-        email
-        joiningdate
-        address
-        clientIds
-        createdAt
-        updatedAt
-        __typename
-      }
-      createdAt
-      updatedAt
-      __typename
-    }
-  }
-`;
-export const updateTheStafftheClient = /* GraphQL */ `
-  mutation UpdateTheStafftheClient(
-    $input: UpdateTheStafftheClientInput!
-    $condition: ModelTheStafftheClientConditionInput
-  ) {
-    updateTheStafftheClient(input: $input, condition: $condition) {
-      id
-      theClientId
-      theStaffId
-      theClient {
-        id
-        name
-        phoneno
-        bname
-        email
-        contactpersonpho
-        address
-        note
-        attachments
-        thestaffID
-        createdAt
-        updatedAt
-        theClientTheIncidentsId
-        __typename
-      }
-      theStaff {
-        id
-        fname
-        phoneno
-        lname
-        email
-        joiningdate
-        address
-        clientIds
-        createdAt
-        updatedAt
-        __typename
-      }
-      createdAt
-      updatedAt
-      __typename
-    }
-  }
-`;
-export const deleteTheStafftheClient = /* GraphQL */ `
-  mutation DeleteTheStafftheClient(
-    $input: DeleteTheStafftheClientInput!
-    $condition: ModelTheStafftheClientConditionInput
-  ) {
-    deleteTheStafftheClient(input: $input, condition: $condition) {
-      id
-      theClientId
-      theStaffId
-      theClient {
-        id
-        name
-        phoneno
-        bname
-        email
-        contactpersonpho
-        address
-        note
-        attachments
-        thestaffID
-        createdAt
-        updatedAt
-        theClientTheIncidentsId
-        __typename
-      }
-      theStaff {
-        id
-        fname
-        phoneno
-        lname
-        email
-        joiningdate
-        address
-        clientIds
-        createdAt
-        updatedAt
-        __typename
-      }
       createdAt
       updatedAt
       __typename

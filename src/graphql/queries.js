@@ -13,8 +13,8 @@ export const getTheClient = /* GraphQL */ `
       address
       note
       attachments
-      thestaffID
-      thestaffs {
+      staffids
+      theStaff {
         nextToken
         __typename
       }
@@ -61,43 +61,7 @@ export const listTheClients = /* GraphQL */ `
         address
         note
         attachments
-        thestaffID
-        createdAt
-        updatedAt
-        theClientTheIncidentsId
-        __typename
-      }
-      nextToken
-      __typename
-    }
-  }
-`;
-export const theClientsByThestaffID = /* GraphQL */ `
-  query TheClientsByThestaffID(
-    $thestaffID: ID!
-    $sortDirection: ModelSortDirection
-    $filter: ModeltheClientFilterInput
-    $limit: Int
-    $nextToken: String
-  ) {
-    theClientsByThestaffID(
-      thestaffID: $thestaffID
-      sortDirection: $sortDirection
-      filter: $filter
-      limit: $limit
-      nextToken: $nextToken
-    ) {
-      items {
-        id
-        name
-        phoneno
-        bname
-        email
-        contactpersonpho
-        address
-        note
-        attachments
-        thestaffID
+        staffids
         createdAt
         updatedAt
         theClientTheIncidentsId
@@ -117,14 +81,23 @@ export const getTheStaff = /* GraphQL */ `
       lname
       email
       joiningdate
+      theClientID
       address
-      theClients {
-        nextToken
-        __typename
-      }
       clientIds
       theClient {
-        nextToken
+        id
+        name
+        phoneno
+        bname
+        email
+        contactpersonpho
+        address
+        note
+        attachments
+        staffids
+        createdAt
+        updatedAt
+        theClientTheIncidentsId
         __typename
       }
       createdAt
@@ -147,6 +120,41 @@ export const listTheStaffs = /* GraphQL */ `
         lname
         email
         joiningdate
+        theClientID
+        address
+        clientIds
+        createdAt
+        updatedAt
+        __typename
+      }
+      nextToken
+      __typename
+    }
+  }
+`;
+export const theStaffsByTheClientID = /* GraphQL */ `
+  query TheStaffsByTheClientID(
+    $theClientID: ID!
+    $sortDirection: ModelSortDirection
+    $filter: ModeltheStaffFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    theStaffsByTheClientID(
+      theClientID: $theClientID
+      sortDirection: $sortDirection
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        id
+        fname
+        phoneno
+        lname
+        email
+        joiningdate
+        theClientID
         address
         clientIds
         createdAt
@@ -175,7 +183,7 @@ export const getTask = /* GraphQL */ `
         address
         note
         attachments
-        thestaffID
+        staffids
         createdAt
         updatedAt
         theClientTheIncidentsId
@@ -231,6 +239,7 @@ export const getTheIncidents = /* GraphQL */ `
         lname
         email
         joiningdate
+        theClientID
         address
         clientIds
         createdAt
@@ -249,7 +258,7 @@ export const getTheIncidents = /* GraphQL */ `
         address
         note
         attachments
-        thestaffID
+        staffids
         createdAt
         updatedAt
         theClientTheIncidentsId
@@ -265,7 +274,7 @@ export const getTheIncidents = /* GraphQL */ `
         address
         note
         attachments
-        thestaffID
+        staffids
         createdAt
         updatedAt
         theClientTheIncidentsId
@@ -338,127 +347,6 @@ export const listUsers = /* GraphQL */ `
         email
         phoneNo
         userType
-        createdAt
-        updatedAt
-        __typename
-      }
-      nextToken
-      __typename
-    }
-  }
-`;
-export const getTheStafftheClient = /* GraphQL */ `
-  query GetTheStafftheClient($id: ID!) {
-    getTheStafftheClient(id: $id) {
-      id
-      theClientId
-      theStaffId
-      theClient {
-        id
-        name
-        phoneno
-        bname
-        email
-        contactpersonpho
-        address
-        note
-        attachments
-        thestaffID
-        createdAt
-        updatedAt
-        theClientTheIncidentsId
-        __typename
-      }
-      theStaff {
-        id
-        fname
-        phoneno
-        lname
-        email
-        joiningdate
-        address
-        clientIds
-        createdAt
-        updatedAt
-        __typename
-      }
-      createdAt
-      updatedAt
-      __typename
-    }
-  }
-`;
-export const listTheStafftheClients = /* GraphQL */ `
-  query ListTheStafftheClients(
-    $filter: ModelTheStafftheClientFilterInput
-    $limit: Int
-    $nextToken: String
-  ) {
-    listTheStafftheClients(
-      filter: $filter
-      limit: $limit
-      nextToken: $nextToken
-    ) {
-      items {
-        id
-        theClientId
-        theStaffId
-        createdAt
-        updatedAt
-        __typename
-      }
-      nextToken
-      __typename
-    }
-  }
-`;
-export const theStafftheClientsByTheClientId = /* GraphQL */ `
-  query TheStafftheClientsByTheClientId(
-    $theClientId: ID!
-    $sortDirection: ModelSortDirection
-    $filter: ModelTheStafftheClientFilterInput
-    $limit: Int
-    $nextToken: String
-  ) {
-    theStafftheClientsByTheClientId(
-      theClientId: $theClientId
-      sortDirection: $sortDirection
-      filter: $filter
-      limit: $limit
-      nextToken: $nextToken
-    ) {
-      items {
-        id
-        theClientId
-        theStaffId
-        createdAt
-        updatedAt
-        __typename
-      }
-      nextToken
-      __typename
-    }
-  }
-`;
-export const theStafftheClientsByTheStaffId = /* GraphQL */ `
-  query TheStafftheClientsByTheStaffId(
-    $theStaffId: ID!
-    $sortDirection: ModelSortDirection
-    $filter: ModelTheStafftheClientFilterInput
-    $limit: Int
-    $nextToken: String
-  ) {
-    theStafftheClientsByTheStaffId(
-      theStaffId: $theStaffId
-      sortDirection: $sortDirection
-      filter: $filter
-      limit: $limit
-      nextToken: $nextToken
-    ) {
-      items {
-        id
-        theClientId
-        theStaffId
         createdAt
         updatedAt
         __typename

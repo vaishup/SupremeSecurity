@@ -19,6 +19,14 @@
         "CreateStaffLogin": {
           "deploymentBucketName": "amplify-supremesecurity-dev-2ffdf-deployment",
           "s3Key": "amplify-builds/CreateStaffLogin-656344504775386c4970-build.zip"
+        },
+        "UpdateStaffIdInClient": {
+          "deploymentBucketName": "amplify-supremesecurity-dev-2ffdf-deployment",
+          "s3Key": "amplify-builds/UpdateStaffIdInClient-626b2f6f6e626d307254-build.zip"
+        },
+        "test1": {
+          "deploymentBucketName": "amplify-supremesecurity-dev-2ffdf-deployment",
+          "s3Key": "amplify-builds/test1-374554314e6a6c5a3377-build.zip"
         }
       },
       "api": {

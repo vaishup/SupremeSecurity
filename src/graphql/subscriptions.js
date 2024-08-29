@@ -15,8 +15,8 @@ export const onCreateTheClient = /* GraphQL */ `
       address
       note
       attachments
-      thestaffID
-      thestaffs {
+      staffids
+      theStaff {
         nextToken
         __typename
       }
@@ -60,8 +60,8 @@ export const onUpdateTheClient = /* GraphQL */ `
       address
       note
       attachments
-      thestaffID
-      thestaffs {
+      staffids
+      theStaff {
         nextToken
         __typename
       }
@@ -105,8 +105,8 @@ export const onDeleteTheClient = /* GraphQL */ `
       address
       note
       attachments
-      thestaffID
-      thestaffs {
+      staffids
+      theStaff {
         nextToken
         __typename
       }
@@ -145,14 +145,23 @@ export const onCreateTheStaff = /* GraphQL */ `
       lname
       email
       joiningdate
+      theClientID
       address
-      theClients {
-        nextToken
-        __typename
-      }
       clientIds
       theClient {
-        nextToken
+        id
+        name
+        phoneno
+        bname
+        email
+        contactpersonpho
+        address
+        note
+        attachments
+        staffids
+        createdAt
+        updatedAt
+        theClientTheIncidentsId
         __typename
       }
       createdAt
@@ -170,14 +179,23 @@ export const onUpdateTheStaff = /* GraphQL */ `
       lname
       email
       joiningdate
+      theClientID
       address
-      theClients {
-        nextToken
-        __typename
-      }
       clientIds
       theClient {
-        nextToken
+        id
+        name
+        phoneno
+        bname
+        email
+        contactpersonpho
+        address
+        note
+        attachments
+        staffids
+        createdAt
+        updatedAt
+        theClientTheIncidentsId
         __typename
       }
       createdAt
@@ -195,14 +213,23 @@ export const onDeleteTheStaff = /* GraphQL */ `
       lname
       email
       joiningdate
+      theClientID
       address
-      theClients {
-        nextToken
-        __typename
-      }
       clientIds
       theClient {
-        nextToken
+        id
+        name
+        phoneno
+        bname
+        email
+        contactpersonpho
+        address
+        note
+        attachments
+        staffids
+        createdAt
+        updatedAt
+        theClientTheIncidentsId
         __typename
       }
       createdAt
@@ -228,7 +255,7 @@ export const onCreateTask = /* GraphQL */ `
         address
         note
         attachments
-        thestaffID
+        staffids
         createdAt
         updatedAt
         theClientTheIncidentsId
@@ -259,7 +286,7 @@ export const onUpdateTask = /* GraphQL */ `
         address
         note
         attachments
-        thestaffID
+        staffids
         createdAt
         updatedAt
         theClientTheIncidentsId
@@ -290,7 +317,7 @@ export const onDeleteTask = /* GraphQL */ `
         address
         note
         attachments
-        thestaffID
+        staffids
         createdAt
         updatedAt
         theClientTheIncidentsId
@@ -325,6 +352,7 @@ export const onCreateTheIncidents = /* GraphQL */ `
         lname
         email
         joiningdate
+        theClientID
         address
         clientIds
         createdAt
@@ -343,7 +371,7 @@ export const onCreateTheIncidents = /* GraphQL */ `
         address
         note
         attachments
-        thestaffID
+        staffids
         createdAt
         updatedAt
         theClientTheIncidentsId
@@ -359,7 +387,7 @@ export const onCreateTheIncidents = /* GraphQL */ `
         address
         note
         attachments
-        thestaffID
+        staffids
         createdAt
         updatedAt
         theClientTheIncidentsId
@@ -395,6 +423,7 @@ export const onUpdateTheIncidents = /* GraphQL */ `
         lname
         email
         joiningdate
+        theClientID
         address
         clientIds
         createdAt
@@ -413,7 +442,7 @@ export const onUpdateTheIncidents = /* GraphQL */ `
         address
         note
         attachments
-        thestaffID
+        staffids
         createdAt
         updatedAt
         theClientTheIncidentsId
@@ -429,7 +458,7 @@ export const onUpdateTheIncidents = /* GraphQL */ `
         address
         note
         attachments
-        thestaffID
+        staffids
         createdAt
         updatedAt
         theClientTheIncidentsId
@@ -465,6 +494,7 @@ export const onDeleteTheIncidents = /* GraphQL */ `
         lname
         email
         joiningdate
+        theClientID
         address
         clientIds
         createdAt
@@ -483,7 +513,7 @@ export const onDeleteTheIncidents = /* GraphQL */ `
         address
         note
         attachments
-        thestaffID
+        staffids
         createdAt
         updatedAt
         theClientTheIncidentsId
@@ -499,7 +529,7 @@ export const onDeleteTheIncidents = /* GraphQL */ `
         address
         note
         attachments
-        thestaffID
+        staffids
         createdAt
         updatedAt
         theClientTheIncidentsId
@@ -550,135 +580,6 @@ export const onDeleteUser = /* GraphQL */ `
       email
       phoneNo
       userType
-      createdAt
-      updatedAt
-      __typename
-    }
-  }
-`;
-export const onCreateTheStafftheClient = /* GraphQL */ `
-  subscription OnCreateTheStafftheClient(
-    $filter: ModelSubscriptionTheStafftheClientFilterInput
-  ) {
-    onCreateTheStafftheClient(filter: $filter) {
-      id
-      theClientId
-      theStaffId
-      theClient {
-        id
-        name
-        phoneno
-        bname
-        email
-        contactpersonpho
-        address
-        note
-        attachments
-        thestaffID
-        createdAt
-        updatedAt
-        theClientTheIncidentsId
-        __typename
-      }
-      theStaff {
-        id
-        fname
-        phoneno
-        lname
-        email
-        joiningdate
-        address
-        clientIds
-        createdAt
-        updatedAt
-        __typename
-      }
-      createdAt
-      updatedAt
-      __typename
-    }
-  }
-`;
-export const onUpdateTheStafftheClient = /* GraphQL */ `
-  subscription OnUpdateTheStafftheClient(
-    $filter: ModelSubscriptionTheStafftheClientFilterInput
-  ) {
-    onUpdateTheStafftheClient(filter: $filter) {
-      id
-      theClientId
-      theStaffId
-      theClient {
-        id
-        name
-        phoneno
-        bname
-        email
-        contactpersonpho
-        address
-        note
-        attachments
-        thestaffID
-        createdAt
-        updatedAt
-        theClientTheIncidentsId
-        __typename
-      }
-      theStaff {
-        id
-        fname
-        phoneno
-        lname
-        email
-        joiningdate
-        address
-        clientIds
-        createdAt
-        updatedAt
-        __typename
-      }
-      createdAt
-      updatedAt
-      __typename
-    }
-  }
-`;
-export const onDeleteTheStafftheClient = /* GraphQL */ `
-  subscription OnDeleteTheStafftheClient(
-    $filter: ModelSubscriptionTheStafftheClientFilterInput
-  ) {
-    onDeleteTheStafftheClient(filter: $filter) {
-      id
-      theClientId
-      theStaffId
-      theClient {
-        id
-        name
-        phoneno
-        bname
-        email
-        contactpersonpho
-        address
-        note
-        attachments
-        thestaffID
-        createdAt
-        updatedAt
-        theClientTheIncidentsId
-        __typename
-      }
-      theStaff {
-        id
-        fname
-        phoneno
-        lname
-        email
-        joiningdate
-        address
-        clientIds
-        createdAt
-        updatedAt
-        __typename
-      }
       createdAt
       updatedAt
       __typename

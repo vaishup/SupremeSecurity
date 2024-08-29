@@ -10,6 +10,7 @@ import { useDropzone } from "react-dropzone";
 import { getUrl } from "aws-amplify/storage";
 import { Modal } from "antd";
 import { Check } from "lucide-react";
+import UserOne from '../images/document.png';
 
 import { getTheClient, listTheStaffs } from "../graphql/queries";
 const AddClient = () => {
@@ -108,6 +109,25 @@ const AddClient = () => {
     const previews = selectedFiles.map((file) => URL.createObjectURL(file));
     setFilePreviews(previews);
   };
+
+  const handleFileChanges = (event) => {
+    const selectedFiles = Array.from(event.target.files);
+  
+    setFiles(selectedFiles);
+  
+    // Generate file previews
+    const previews = selectedFiles.map((file) => {
+      const isImage = file.type.startsWith("image/");
+      return {
+        url: isImage ? URL.createObjectURL(file) : null, // Generate preview for image files only
+        name: file.name,
+        isImage: isImage, // Flag to check if the file is an image
+      };
+    });
+  
+    setFilePreviews([...filePreviews, ...previews]); // Append the new previews to existing ones
+  };
+  
 
   // Handle file changes
   // const handleFileChange = (event) => {
@@ -519,32 +539,42 @@ const AddClient = () => {
                 </div>
 
                 <div className="mb-6">
-                  <label className="mb-2.5 block text-black dark:text-white">
-                    File Upload (Upload up to 10 images)
-                  </label>
-                  <input
-                    type="file"
-                    multiple
-                    onChange={handleFileChange}
-                    className="w-full rounded border-[1.5px] border-stroke bg-transparent py-2 px-4 text-black outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                  />
-                  {errors.fileUpload && (
-                    <p className="text-red-500 mt-2">{errors.fileUpload}</p>
-                  )}
+  <label className="mb-2.5 block text-black dark:text-white">
+    File Upload (Upload up to 10 images)
+  </label>
+  <input
+    type="file"
+    multiple
+    onChange={handleFileChange}
+    className="w-full rounded border-[1.5px] border-stroke bg-transparent py-2 px-4 text-black outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+  />
+  {errors.fileUpload && (
+    <p className="text-red-500 mt-2">{errors.fileUpload}</p>
+  )}
 
-                  <div className="mt-4 flex flex-wrap gap-4">
-                    {filePreviews.map((preview, index) => (
-                      <img
-                        key={index}
-                        className="m-3"
-                        width={120}
-                        height={120}
-                        src={preview}
-                        alt={`Preview ${index}`}
-                      />
-                    ))}
-                  </div>
-                </div>
+  <div className="mt-4 flex flex-wrap gap-4">
+    {filePreviews.map((preview, index) => (
+      <div key={index} className="m-3">
+        {preview.isImage ? (
+          <img
+            width={120}
+            height={120}
+            src={preview.url}
+            alt={`Preview ${index}`}
+            className="rounded border border-gray-300"
+          />
+        ) : (
+          <div className="flex items-center justify-center w-28 h-28 bg-gray-200 border border-gray-300 rounded">
+           <img src={UserOne} alt="User" width={80}height={80} />
+
+            <p className="text-xs mt-2">{preview.name}</p>
+          </div>
+        )}
+      </div>
+    ))}
+  </div>
+</div>
+
 
                 <div className="mb-6">
                   <label className="mb-2.5 block text-black dark:text-white">

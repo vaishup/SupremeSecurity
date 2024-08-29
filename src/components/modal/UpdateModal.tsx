@@ -1,22 +1,25 @@
-import React, { useState, useEffect } from "react";
-import { Row, Col, Modal, Button } from "antd";
-import { Flex, Spin } from "antd";
-import * as mutation from "../../graphql/mutations.js";
-
-import flatpickr from "flatpickr";
-import { generateClient } from "aws-amplify/api";
-import { useNavigate } from "react-router-dom"; // Import hooks from react-router-dom
-
+import React, { useState, useEffect } from 'react';
+import { Row, Col, Modal, Button } from 'antd';
+import { Flex, Spin } from 'antd';
+import * as mutation from '../../graphql/mutations.js';
+import axios from 'axios';
+import flatpickr from 'flatpickr';
+import { generateClient } from 'aws-amplify/api';
+import { useNavigate } from 'react-router-dom'; // Import hooks from react-router-dom
+import {
+  pharmacyGroupCreationRequestsByPharmacyID,
+  listTheStaffs,getTheClient
+} from '../../graphql/queries';
 const UpdateModal = ({ id, setIsShow }) => {
-  console.log("id",id);
-  
+  console.log('id', id);
+
   const [isDialogShow, setIsDialogShow] = useState(false); // State to track if the dialog is open
   const [isModalShow, setIsModalShow] = useState(false); // State to track if the dialog is open
   const [selectedDClients, setSelectedClients] = useState([]);
-  const [searchValue, setSearchValue] = useState("");
+  const [searchValue, setSearchValue] = useState('');
   const client = generateClient();
   const [loading, setLoading] = useState(true); // Add loading state
-  const [errorMessage, setErrorMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState('');
   const [clientList, setClientList] = useState([]);
   const navigation = useNavigate();
 
@@ -25,11 +28,11 @@ const UpdateModal = ({ id, setIsShow }) => {
     setIsModalShow(false);
   };
   const handleCancle = () => {
-    navigation("/stafflist");
+    navigation('/stafflist');
     setIsModalShow(false);
     setIsShow(false);
   };
- 
+
   useEffect(() => {
     listClient();
   }, []);
@@ -62,44 +65,118 @@ const UpdateModal = ({ id, setIsShow }) => {
       // Access the correct property from the response
       const clientData = response.data.listTheClients;
 
-      console.log("clientData", clientData);
+      console.log('clientData', clientData);
 
       // Set the client data to state
       setClientList(clientData.items);
       setLoading(false); // Ensure you're setting the items array to state
     } catch (error) {
-      console.error("Error fetching client details:", error);
+      console.error('Error fetching client details:', error);
+      setLoading(false);
+    }
+  };
+  const triggerCreateBatchFunction = async (patientOrdersArray) => {
+    console.log('patientOrdersArray..', patientOrdersArray);
+
+    //setLoading(true); // Show loader
+    try {
+      setLoading(true);
+      const response = await axios.post(
+        'https://1k3mfl4tnb.execute-api.us-east-2.amazonaws.com/default/UpdateStaffIdInClient-dev',
+        { orders: patientOrdersArray },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        },
+      );
+
+      //navigation(`/batchList`);
+
+      console.log('Lambda response:', response.data);
+      return response.data;
+    } catch (error) {
+    } finally {
       setLoading(false);
     }
   };
 
   const handleAssign = async () => {
     if (selectedDClients.length === 0) {
-      setErrorMessage("Please select at least one Client.");
+      setErrorMessage('Please select at least one Client.');
       return;
     } else {
-      setErrorMessage("");
+      //setErrorMessage('');
       try {
-        const variables = {
-          input: {
-            id: id,
-            clientIds: selectedDClients,
-            //assignedStatus: 'Assigned',
-          },
+        const input = {
+          id: id,
+          clientIds: selectedDClients,
         };
         const updateTheStaffs = await client.graphql({
           query: mutation.updateTheStaff,
-          variables: variables,
+          variables: { input }, // Note the { input } wrapping here
         });
 
+        // console.log('input...', input);
+        // const transformedInput = {
+        //   clientIds: input.clientIds,
+        //   staffId: input.id, // Use the staff id here
+        // };
 
-     
+        for (const clientId of input.clientIds) {
+          try {
+            // Step 1: Fetch the existing client record
+            const clientData = await client.graphql({
+              query: getTheClient, // Assuming `getTheClient` is your query to fetch client data
+              variables: { id: clientId },
+            });
+
+            const existingClient = clientData.data.getTheClient;
+            console.log("existingClient",existingClient);
+            
+            let existingStaffIds = existingClient.staffids || []; // Retrieve or initialize the staffIds array
+            console.log("existingStaffIds",existingStaffIds);
+            
+            // Step 2: Add new staff ID if it's not already in the array
+            if (!existingStaffIds.includes(input.id)) {
+              existingStaffIds.push(input.id);
+
+              // Step 3: Update the client record with the new staffIds array
+              const updateTheClient = await client.graphql({
+                query: mutation.updateTheClient, // Assuming `updateTheClient` is your mutation to update client data
+                variables: {
+                  input: {
+                    id: clientId,
+                    staffids: existingStaffIds, // Update staffIds array
+                  },
+                },
+              });
+              console.log(`Updated staffIds for clientId: ${clientId}`);
+              console.log(`Updated staffIds for clientId: ${updateTheClient}`);
+            } else {
+              console.log(
+                `StaffId ${input.id} already exists for clientId: ${clientId}`,
+              );
+            }
+          } catch (error) {
+            console.error(
+              `Error updating staffIds for clientId: ${clientId}`,
+              error,
+            );
+          }
+        }
+        //console.log('transformInnput ids ', transformedInput);
+
+        //triggerCreateBatchFunction(transformedInput);
+
+        console.log('updateTheStaffs...', updateTheStaffs);
+
         setIsShow(false);
         setIsDialogShow(false);
         setIsModalShow(true);
-        console.log("Update result:", updateTheStaffs);
+        console.log('Update result:', updateTheStaffs);
       } catch (error) {
-        console.error("Error updating pharmacy order group:", error);
+        console.error('updateTheStaffs:', error);
       }
     }
   };
@@ -117,16 +194,16 @@ const UpdateModal = ({ id, setIsShow }) => {
   };
   const handFetch = () => {
     setIsModalShow(false);
-    navigation("/stafflist");
+    navigation('/stafflist');
   };
   //   // Filter driverGroups based on the search value
 
   const filteredclients = clientList.filter((driver) =>
-    driver.bname.toLowerCase().includes(searchValue.toLowerCase())
+    driver.bname.toLowerCase().includes(searchValue.toLowerCase()),
   );
   const contentStyle: React.CSSProperties = {
     padding: 50,
-    background: "rgba(0, 0, 0, 0.05)",
+    background: 'rgba(0, 0, 0, 0.05)',
     borderRadius: 4,
   };
 
@@ -134,7 +211,7 @@ const UpdateModal = ({ id, setIsShow }) => {
 
   return (
     <>
-      {" "}
+      {' '}
       {loading ? (
         <Spin tip="Loading" size="large">
           {content}
@@ -147,7 +224,7 @@ const UpdateModal = ({ id, setIsShow }) => {
 
               <div className="relative w-[300px] mt-5">
                 <input
-                  style={{ background: "#f2f2f2" }}
+                  style={{ background: '#f2f2f2' }}
                   type="text"
                   placeholder="Search for Client..."
                   className="w-full pl-10 pr-2 py-1 rounded-full bg-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"

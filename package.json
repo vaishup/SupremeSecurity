@@ -45,6 +45,7 @@
     "antd": "^5.17.2",
     "apexcharts": "^3.41.0",
     "aws-amplify": "^6.5.2",
+    "axios": "^1.7.5",
     "chart.js": "^4.4.4",
     "class-variance-authority": "^0.7.0",
     "cmdk": "^1.0.0",

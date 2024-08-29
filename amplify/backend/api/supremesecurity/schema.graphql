@@ -1,4 +1,4 @@
-type theClient @model @auth(rules: [{allow: public}]) {
+type theClient @model @auth(rules: [{ allow: public }]) {
   id: ID!
   name: String!
   phoneno: String
@@ -8,38 +8,34 @@ type theClient @model @auth(rules: [{allow: public}]) {
   address: String
   note: String
   attachments: [String]
-  thestaffID: ID @index(name: "bytheStaff")
-  thestaffs: [theStaff] @manyToMany(relationName: "theStafftheClient")
+  staffids: [String]
+  theStaff: [theStaff] @hasMany(indexName: "byTheClient", fields: ["id"]) # The correct field name
   theIncidents: theIncidents @belongsTo
-  TaskID: [Task] @hasMany(indexName: "Task", fields: ["id"])
 }
 
-type theStaff @model @auth(rules: [{allow: public}]) {
+type theStaff @model @auth(rules: [{ allow: public }]) {
   id: ID!
   fname: String!
   phoneno: String
   lname: String
   email: String
   joiningdate: String
+  theClientID: ID @index(name: "byTheClient")
   address: String
-  theClients: [theClient] @hasMany(indexName: "bytheStaff", fields: ["id"])
   clientIds: [String]
-  theClient: [theClient] @manyToMany(relationName: "theStafftheClient")
+  theClient: theClient @belongsTo(fields: ["theClientID"])
 }
 
-type Task @model @auth(rules: [{allow: public}]) {
+type Task @model @auth(rules: [{ allow: public }]) {
   id: ID!
   title: String!
   description: String
   frequency: String
   theClient: theClient @hasOne
   clientId: String
-  bytheClientID: ID @index(name: "byTheClientId", queryField: "tasksByClientId")
 }
 
-
-
-type theIncidents @model @auth(rules: [{allow: public}]) {
+type theIncidents @model @auth(rules: [{ allow: public }]) {
   id: ID!
   title: String!
   description: String
@@ -56,11 +52,10 @@ type theIncidents @model @auth(rules: [{allow: public}]) {
   bytheClientID: theClient @hasOne
 }
 
-type user @model @auth(rules: [{allow: public}]) {
+type user @model @auth(rules: [{ allow: public }]) {
   id: ID!
   name: String
   email: String
   phoneNo: String
   userType: String
 }
- 

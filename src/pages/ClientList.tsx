@@ -184,7 +184,7 @@ const ClientList = () => {
           <button
             className="btn-grad w-[180px] pr-20"
             onClick={() => {
-              navigation("/clientdetail");
+              navigation("/addclient");
             }}
           >
             <svg
