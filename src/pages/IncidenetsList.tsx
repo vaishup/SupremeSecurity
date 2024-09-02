@@ -136,70 +136,71 @@ const IncidenetsList = () => {
       </div>
 
       <div className="overflow-x-auto mt-10">
-        <table className="min-w-full bg-white rounded-lg shadow overflow-hidden">
-          <thead className="bg-gradient-to-r from-[#7a2828] to-[#a73737]">
-            <tr>
-              <th className="px-6 py-3 border-b border-gray-200 text-white text-left text-sm uppercase font-bold">
-                Title
-              </th>
-              <th className="px-6 py-3 border-b border-gray-200 text-white text-left text-sm uppercase font-bold">
-                Description
-              </th>
-              <th className="px-6 py-3 border-b border-gray-200 text-white text-left text-sm uppercase font-bold">
-                Address
-              </th>
-              <th className="px-6 py-3 border-b border-gray-200 text-white text-left text-sm uppercase font-bold">
-                Client Name
-              </th>
-              <th className="px-6 py-3 border-b border-gray-200 text-white text-left text-sm uppercase font-bold">
-                CreatedAt
-              </th>
-              <th className="px-6 py-3 border-b border-gray-200 text-white text-left text-sm uppercase font-bold">
-                Action
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {incidentList.map((order) => (
-              <tr key={order.id}>
-                <td className="px-6 py-4 border-b border-gray-200 bg-white text-sm">
-                  {order.title}
-                </td>
-                <td className="px-6 py-4 border-b border-gray-200 bg-white text-sm">
-                  {order.description}
-                </td>
-                <td className="px-6 py-4 border-b border-gray-200 bg-white text-sm">
-                  {order.address}
-                </td>
-                <td className="px-6 py-4 border-b border-gray-200 bg-white text-sm">
-                  {order.clientBname}
-                </td>
-                <td className="px-6 py-4 border-b border-gray-200 bg-white text-sm">
-                  {order.createdAt}
-                </td>
+  {incidentList.length > 0 ? (
+    <table className="min-w-full bg-white rounded-lg shadow overflow-hidden">
+      <thead className="bg-gradient-to-r from-[#7a2828] to-[#a73737]">
+        <tr>
+          <th className="px-6 py-3 border-b border-gray-200 text-white text-left text-sm uppercase font-bold">
+            Title
+          </th>
+          <th className="px-6 py-3 border-b border-gray-200 text-white text-left text-sm uppercase font-bold">
+            Description
+          </th>
+          <th className="px-6 py-3 border-b border-gray-200 text-white text-left text-sm uppercase font-bold">
+            Address
+          </th>
+          <th className="px-6 py-3 border-b border-gray-200 text-white text-left text-sm uppercase font-bold">
+            Client Name
+          </th>
+          <th className="px-6 py-3 border-b border-gray-200 text-white text-left text-sm uppercase font-bold">
+            CreatedAt
+          </th>
+          <th className="px-6 py-3 border-b border-gray-200 text-white text-left text-sm uppercase font-bold">
+            Action
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        {incidentList.map((order) => (
+          <tr key={order.id}>
+            <td className="px-6 py-4 border-b border-gray-200 bg-white text-sm">
+              {order.title}
+            </td>
+            <td className="px-6 py-4 border-b border-gray-200 bg-white text-sm">
+              {order.description}
+            </td>
+            <td className="px-6 py-4 border-b border-gray-200 bg-white text-sm">
+              {order.address}
+            </td>
+            <td className="px-6 py-4 border-b border-gray-200 bg-white text-sm">
+              {order.clientBname}
+            </td>
+            <td className="px-6 py-4 border-b border-gray-200 bg-white text-sm">
+              {order.createdAt}
+            </td>
+            <td className="px-6 py-4 border-b border-gray-200 bg-white text-sm flex-row">
+              <div className="flex flex-row">
+                <PencilIcon
+                  onClick={() => {
+                    navigation(`/addIncident/${order.id}`);
+                  }}
+                  className="mr-5 inline-block transition duration-300 ease-in-out transform hover:text-red-600 hover:scale-110"
+                  color="blue"
+                  size={20}
+                />
+              </div>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  ) : (
+    <div className="text-center py-10 text-gray-500">
+      No data found
+    </div>
+  )}
+</div>
 
-                <td className="px-6 py-4 border-b border-gray-200 bg-white text-sm flex-row">
-                  <div className="flex flex-row">
-                    <PencilIcon
-                      onClick={() => {
-                        navigation(`/addIncident/${order.id}`); // Navigate to AddStaff page with the staff ID
-                      }}
-                      className="mr-5 inline-block transition duration-300 ease-in-out transform hover:text-red-600 hover:scale-110"
-                      color="blue"
-                      size={20}
-                    />
-                    {/* <Trash2
-                      className="inline-block transition duration-300 ease-in-out transform hover:text-red-600 hover:scale-110"
-                      color="red"
-                      size={20}
-                    /> */}
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
     </>
   );
 };

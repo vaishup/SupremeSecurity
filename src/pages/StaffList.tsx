@@ -251,6 +251,7 @@ const StaffList = () => {
       </div>
 
       <div className="overflow-x-auto mt-10">
+      {stafflist.length > 0 ? (
         <table className="min-w-full bg-white rounded-lg shadow overflow-hidden">
           <thead className="bg-gradient-to-r from-[#7a2828] to-[#a73737]">
             <tr>
@@ -318,6 +319,11 @@ const StaffList = () => {
             ))}
           </tbody>
         </table>
+        ) : (
+          <div className="text-center py-10 text-gray-500">
+            No data found
+          </div>
+        )}
       </div>
     </>
   );

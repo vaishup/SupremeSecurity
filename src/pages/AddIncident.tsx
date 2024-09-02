@@ -22,6 +22,8 @@ import { getUrl } from "aws-amplify/storage";
 import { setDate } from "date-fns";
 import { Modal } from "antd";
 import { Check } from "lucide-react";
+import UserOne from '../images/document.png';
+
 const AddIncident = () => {
   const [staffname, setStaffName] = useState();
   const [staffid, setStaffId] = useState();
@@ -422,18 +424,21 @@ const AddIncident = () => {
                     <p className="text-red-500 mt-2">{errors.fileUpload}</p>
                   )} */}
 
-                  <div className="mt-4 flex flex-wrap gap-4">
-                    {filePreviews.map((preview, index) => (
-                      <img
-                        key={index}
-                        className="m-3"
-                        width={120}
-                        height={120}
-                        src={preview}
-                        alt={`Preview ${index}`}
-                      />
-                    ))}
-                  </div>
+<div className="mt-4 flex flex-wrap gap-4">
+
+<AttachmentPreviews filePreviews={filePreviews} />
+
+  {filePreviews.map((preview, index) => (
+    <img
+      key={index}
+      className="m-3"
+      width={120}
+      height={120}
+      src={preview}
+      alt={`Preview ${index}`}
+    />
+  ))}
+</div>
                 </div>
                 {errors.desc && (
                   <p className="text-red-500 text-sm mt-1">{errors.desc}</p>
@@ -454,6 +459,39 @@ const AddIncident = () => {
         </div>
       </div>
     </>
+  );
+};
+
+const renderAttachment = (url) => {
+  // Check if the file is an image
+  const isImage = url.match(/\.(jpeg|jpg|gif|png)$/);
+
+  if (isImage) {
+    // Render an image preview
+    return (
+      <div key={url} className="file-preview">
+        <img src={url} alt="attachment" className="image-preview" />
+      </div>
+    );
+  } else {
+    // Render a file icon with a download option
+    return (
+      <div key={url} className="file-preview">
+        <a href={url} download className="file-download">
+        <img src={UserOne} alt="User" width={80}height={80} />
+
+          {/* Replace with a file icon */}
+          <span>Download </span>
+        </a>
+      </div>
+    );
+  }
+};
+const AttachmentPreviews = ({ filePreviews }) => {
+  return (
+    <div className="attachment-previews">
+      {filePreviews.map((url) => renderAttachment(url))}
+    </div>
   );
 };
 export default AddIncident;

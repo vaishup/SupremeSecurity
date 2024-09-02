@@ -1,31 +1,31 @@
-import React, { useState, useEffect, useRef } from "react";
-import DefaultLayout from "../layout/DefaultLayout";
-import Breadcrumb from "../components/Breadcrumbs/Breadcrumb";
-import { ArrowUpFromLine } from "@heroicons/react/outline";
-import * as mutation from "../graphql/mutations.js";
-import { generateClient } from "aws-amplify/api";
-import { useParams, useNavigate } from "react-router-dom"; // Import hooks from react-router-dom
-import { uploadData } from "aws-amplify/storage";
-import { useDropzone } from "react-dropzone";
-import { getUrl } from "aws-amplify/storage";
-import { Modal } from "antd";
-import { Check } from "lucide-react";
+import React, { useState, useEffect, useRef } from 'react';
+import DefaultLayout from '../layout/DefaultLayout';
+import Breadcrumb from '../components/Breadcrumbs/Breadcrumb';
+import { ArrowUpFromLine } from '@heroicons/react/outline';
+import * as mutation from '../graphql/mutations.js';
+import { generateClient } from 'aws-amplify/api';
+import { useParams, useNavigate } from 'react-router-dom'; // Import hooks from react-router-dom
+import { uploadData } from 'aws-amplify/storage';
+import { useDropzone } from 'react-dropzone';
+import { getUrl } from 'aws-amplify/storage';
+import { Modal } from 'antd';
+import { Check } from 'lucide-react';
 import UserOne from '../images/document.png';
 
-import { getTheClient, listTheStaffs } from "../graphql/queries";
+import { getTheClient, listTheStaffs } from '../graphql/queries';
 const AddClient = () => {
   const API = generateClient();
   const { id } = useParams(); // Get the staff ID from the URL, if it exists
   const navigation = useNavigate();
   const [filePreviewss, setFilePreviewss] = useState<File[]>([]);
   const [formData, setFormData] = useState({
-    name: "",
-    phoneNumber: "",
-    businessName: "",
-    email: "",
-    contactPersonPhone: "",
-    address: "",
-    note: "",
+    name: '',
+    phoneNumber: '',
+    businessName: '',
+    email: '',
+    contactPersonPhone: '',
+    address: '',
+    note: '',
   });
   const [files, setFiles] = useState([]);
   const [filePreviews, setFilePreviews] = useState([]);
@@ -37,14 +37,14 @@ const AddClient = () => {
       const getUrlResult = await getUrl({
         key,
         options: {
-          accessLevel: "guest", // Change as necessary (guest, private, protected)
+          accessLevel: 'guest', // Change as necessary (guest, private, protected)
         },
       });
 
       //console.log('Fetched file URL:', getUrlResult.url.toString()); // Log the URL for verification
       return getUrlResult.url.toString(); // Ensure the URL is returned as a string
     } catch (error) {
-      console.error("Error getting S3 URL: ", error);
+      console.error('Error getting S3 URL: ', error);
       throw error;
     }
   };
@@ -52,7 +52,7 @@ const AddClient = () => {
     if (id) {
       const fetchClientfData = async () => {
         try {
-          console.log("Fetching staff with ID:", id); // Debug log
+          console.log('Fetching staff with ID:', id); // Debug log
 
           const staffData = await API.graphql({
             query: getTheClient, // Replace with your actual query to get staff by ID
@@ -60,7 +60,7 @@ const AddClient = () => {
           });
 
           const client = staffData.data.getTheClient;
-          console.log("staff...s", client);
+          console.log('staff...s', client);
 
           setFormData({
             name: client.name,
@@ -77,14 +77,14 @@ const AddClient = () => {
             const urls = await Promise.all(
               client.attachments.map(async (attachment) => {
                 return await getS3Url(attachment);
-              })
+              }),
             );
-            console.log("urls...", urls);
+            console.log('urls...', urls);
 
             setFilePreviews(urls);
           }
         } catch (error) {
-          console.error("Error fetching staff data:", error);
+          console.error('Error fetching staff data:', error);
         }
       };
       fetchClientfData();
@@ -112,22 +112,21 @@ const AddClient = () => {
 
   const handleFileChanges = (event) => {
     const selectedFiles = Array.from(event.target.files);
-  
+
     setFiles(selectedFiles);
-  
+
     // Generate file previews
     const previews = selectedFiles.map((file) => {
-      const isImage = file.type.startsWith("image/");
+      const isImage = file.type.startsWith('image/');
       return {
         url: isImage ? URL.createObjectURL(file) : null, // Generate preview for image files only
         name: file.name,
         isImage: isImage, // Flag to check if the file is an image
       };
     });
-  
+
     setFilePreviews([...filePreviews, ...previews]); // Append the new previews to existing ones
   };
-  
 
   // Handle file changes
   // const handleFileChange = (event) => {
@@ -149,14 +148,14 @@ const AddClient = () => {
   // Validate form data
   const validate = () => {
     const errors = {};
-    if (!formData.name) errors.name = "Name is required";
-    if (!formData.phoneNumber) errors.phoneNumber = "Phone number is required";
-    if (!formData.email) errors.email = "Email is required";
+    if (!formData.name) errors.name = 'Name is required';
+    if (!formData.phoneNumber) errors.phoneNumber = 'Phone number is required';
+    if (!formData.email) errors.email = 'Email is required';
     if (!formData.contactPersonPhone)
       errors.contactPersonPhone = "Contact person's phone number is required";
-    if (!formData.address) errors.address = "Address is required";
+    if (!formData.address) errors.address = 'Address is required';
     if (files.length > 10) {
-      errors.fileUpload = "You can only upload up to 10 images.";
+      errors.fileUpload = 'You can only upload up to 10 images.';
     }
     return errors;
   };
@@ -167,7 +166,7 @@ const AddClient = () => {
   const { getRootProps, getInputProps } = useDropzone({
     onDrop,
     accept:
-      "image/*,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      'image/*,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document',
   });
 
   // Handle form submission
@@ -200,7 +199,7 @@ const AddClient = () => {
       //--------------------------- upload images to s3 bucket--------------------------------------
       try {
         const uploadedFiles = await Promise.all(
-          filePreviewss.map((file) => uploadToS3s(file, clientId, file.name))
+          filePreviewss.map((file) => uploadToS3s(file, clientId, file.name)),
         );
         // const uploadedFileKey = await uploadToS3(files, clientId);
         const updateInput = {
@@ -211,16 +210,16 @@ const AddClient = () => {
           query: mutation.updateTheClient,
           variables: { input: updateInput },
         });
-        console.log(createdItem, "suceesfully created");
+        console.log(createdItem, 'suceesfully created');
 
         // Handle the success (e.g., update UI, make further API calls)
       } catch (error) {
-        console.error("Error uploading file:", error);
+        console.error('Error uploading file:', error);
         // Handle the error (e.g., display error message to user)
       }
       ///----------------- fetch images-----------------------------------------------
     } else {
-      console.log("addedsd,,", clientInput);
+      console.log('addedsd,,', clientInput);
 
       clientesponse = await API.graphql({
         query: mutation.createTheClient,
@@ -230,15 +229,13 @@ const AddClient = () => {
 
       const createdItem = clientesponse.data.createTheClient;
       const clientId = createdItem.id; // Replace with actual client ID
-      console.log("clientId...", clientId);
+      console.log('clientId...', clientId);
 
       //--------------------------- upload images to s3 bucket--------------------------------------
       try {
         const uploadedFiles = await Promise.all(
-          filePreviewss.map((file) => uploadToS3s(file, clientId, file.name))
+          filePreviewss.map((file) => uploadToS3s(file, clientId, file.name)),
         );
-        // const uploadedFileKey = await uploadToS3(files, clientId);
-        console.log("Files uploaded successfully:", uploadedFiles);
         const updateInput = {
           id: clientId,
           attachments: uploadedFiles,
@@ -248,12 +245,12 @@ const AddClient = () => {
           query: mutation.updateTheClient,
           variables: { input: updateInput },
         });
-        console.log(createdItem, "suceesfully created");
+        console.log(createdItem, 'suceesfully created');
         setClientId(clientId);
         setIsOpen(true);
         // Handle the success (e.g., update UI, make further API calls)
       } catch (error) {
-        console.error("Error uploading file:", error);
+        console.error('Error uploading file:', error);
         // Handle the error (e.g., display error message to user)
       }
       // navigation("/clientlist");
@@ -264,20 +261,20 @@ const AddClient = () => {
     // Submit form data to your backend or API
     // Reset form if needed
     setFormData({
-      name: "",
-      phoneNumber: "",
-      businessName: "",
-      email: "",
-      contactPersonPhone: "",
-      address: "",
-      note: "",
+      name: '',
+      phoneNumber: '',
+      businessName: '',
+      email: '',
+      contactPersonPhone: '',
+      address: '',
+      note: '',
     });
     setFiles([]);
     setFilePreviews([]);
     setErrors({});
   };
   function renderFilePreview(file) {
-    if (file.type.startsWith("image/")) {
+    if (file.type.startsWith('image/')) {
       // Render image preview
       return (
         <img
@@ -286,7 +283,7 @@ const AddClient = () => {
           className="w-16 h-16 object-cover rounded"
         />
       );
-    } else if (file.type === "application/pdf") {
+    } else if (file.type === 'application/pdf') {
       // Render PDF preview icon
       return <i className="fas fa-file-pdf text-red-500 text-3xl"></i>;
     } else {
@@ -295,38 +292,9 @@ const AddClient = () => {
     }
   }
 
-  // const uploadToS3 = async (files, clientId) => {
-  //   try {
-  //     const uploadedKeys = await Promise.all(
-  //       files.map(async (file, index) => {
-  //         const folderNumber = index + 1; // Create folders like 1, 2, 3, etc.
-  //         const fileName = file.name;
-  //         const fullKey = `ClientImages/${clientId}/image/${folderNumber}/${fileName}`;
-
-  //         console.log("Uploading file:", fileName, "to", fullKey);
-
-  //         const result = await uploadData({
-  //           key: fullKey,
-  //           data: file,
-  //           options: {
-  //             accessLevel: "guest", // Change as necessary (guest, private, protected)
-  //           },
-  //         });
-
-  //         console.log("Uploaded file key:", fullKey); // Log the key for verification
-  //         return fullKey; // Return the key to use it in the mutation or elsewhere
-  //       })
-  //     );
-
-  //     return uploadedKeys; // Return the array of uploaded file keys
-  //   } catch (error) {
-  //     console.error("Error uploading to S3: ", error);
-  //     throw error; // Rethrow the error for handling in the calling function
-  //   }
-  // };
   const uploadToS3s = async (file, ticketId, fileName) => {
     try {
-      console.log("sds..", file, ticketId, fileName);
+      console.log('sds..', file, ticketId, fileName);
 
       const fullKey = `ClientImages/${ticketId}/image/${fileName}`;
 
@@ -334,14 +302,14 @@ const AddClient = () => {
         key: fullKey,
         data: file,
         options: {
-          accessLevel: "guest", // Change as necessary (guest, private, protected)
+          accessLevel: 'guest', // Change as necessary (guest, private, protected)
         },
       });
 
-      console.log("Uploaded file key:", fullKey); // Log the key for verification
+      console.log('Uploaded file key:', fullKey); // Log the key for verification
       return fullKey; // Return the key to use it in the mutation
     } catch (error) {
-      console.error("Error uploading to S3: ", error);
+      console.error('Error uploading to S3: ', error);
       throw error; // Rethrow the error for handling in the calling function
     }
   };
@@ -352,11 +320,11 @@ const AddClient = () => {
   };
   const handleCancle = () => {
     setIsOpen(false);
-    navigation("/stafflist");
+    navigation('/stafflist');
   };
   return (
     <>
-      <Breadcrumb pageName={id ? "Edit Client" : "Add Client"} />
+      <Breadcrumb pageName={id ? 'Edit Client' : 'Add Client'} />
       <Modal
         open={isOpen}
         onCancel={handleCancle}
@@ -373,8 +341,8 @@ const AddClient = () => {
             key="back"
             onClick={handleDialogue}
           >
-            {" "}
-            OK{" "}
+            {' '}
+            OK{' '}
           </button>,
         ]}
       >
@@ -442,7 +410,7 @@ const AddClient = () => {
                       type="text"
                       placeholder="Enter your first Name"
                       className={`w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary ${
-                        errors.name ? "border-red-500" : ""
+                        errors.name ? 'border-red-500' : ''
                       } dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary`}
                     />
                     {errors.name && (
@@ -461,7 +429,7 @@ const AddClient = () => {
                       type="text"
                       placeholder="Enter your Phone Number"
                       className={`w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary ${
-                        errors.phoneNumber ? "border-red-500" : ""
+                        errors.phoneNumber ? 'border-red-500' : ''
                       } dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary`}
                     />
                     {errors.phoneNumber && (
@@ -484,7 +452,7 @@ const AddClient = () => {
                       type="email"
                       placeholder="Enter your email address"
                       className={`w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary ${
-                        errors.email ? "border-red-500" : ""
+                        errors.email ? 'border-red-500' : ''
                       } dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary`}
                     />
                     {errors.email && (
@@ -496,7 +464,7 @@ const AddClient = () => {
 
                   <div className="w-full xl:w-1/2">
                     <label className="mb-2.5 block text-black dark:text-white">
-                      Contact Person phone{" "}
+                      Contact Person phone{' '}
                       <span className="text-meta-1">*</span>
                     </label>
                     <input
@@ -506,7 +474,7 @@ const AddClient = () => {
                       type="text"
                       placeholder="Enter your Contact Person phone"
                       className={`w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary ${
-                        errors.contactPersonPhone ? "border-red-500" : ""
+                        errors.contactPersonPhone ? 'border-red-500' : ''
                       } dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary`}
                     />
                     {errors.contactPersonPhone && (
@@ -528,7 +496,7 @@ const AddClient = () => {
                     type="text"
                     placeholder="Enter Address"
                     className={`w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary ${
-                      errors.address ? "border-red-500" : ""
+                      errors.address ? 'border-red-500' : ''
                     } dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary`}
                   />
                   {errors.address && (
@@ -539,42 +507,46 @@ const AddClient = () => {
                 </div>
 
                 <div className="mb-6">
-  <label className="mb-2.5 block text-black dark:text-white">
-    File Upload (Upload up to 10 images)
-  </label>
-  <input
-    type="file"
-    multiple
-    onChange={handleFileChanges}
-    className="w-full rounded border-[1.5px] border-stroke bg-transparent py-2 px-4 text-black outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-  />
-  {errors.fileUpload && (
-    <p className="text-red-500 mt-2">{errors.fileUpload}</p>
-  )}
+                  <label className="mb-2.5 block text-black dark:text-white">
+                    File Upload (Upload up to 10 images)
+                  </label>
+                  <input
+                    type="file"
+                    multiple
+                    onChange={handleFileChanges}
+                    className="w-full rounded border-[1.5px] border-stroke bg-transparent py-2 px-4 text-black outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                  />
+                  {errors.fileUpload && (
+                    <p className="text-red-500 mt-2">{errors.fileUpload}</p>
+                  )}
 
-  <div className="mt-4 flex flex-wrap gap-4">
-    {filePreviews.map((preview, index) => (
-      <div key={index} className="m-3">
-        {preview.isImage ? (
-          <img
-            width={120}
-            height={120}
-            src={preview.url}
-            alt={`Preview ${index}`}
-            className="rounded border border-gray-300"
-          />
-        ) : (
-          <div className="flex flex-col items-center justify-center w-28 h-28 bg-gray-200  rounded">
-           <img src={UserOne} alt="User" width={80}height={80} />
+                  <div className="mt-4 flex flex-wrap gap-4">
+                    {filePreviews.map((preview, index) => (
+                      <div key={index} className="m-3">
+                        {preview.isImage ? (
+                          <img
+                            width={120}
+                            height={120}
+                            src={preview.url}
+                            alt={`Preview ${index}`}
+                            className="rounded border border-gray-300"
+                          />
+                        ) : (
+                          <div className="flex flex-col items-center justify-center w-28 h-28 bg-gray-200  rounded">
+                            <img
+                              src={UserOne}
+                              alt="User"
+                              width={80}
+                              height={80}
+                            />
 
-            <p className="text-xs mt-2">{preview.name}</p>
-          </div>
-        )}
-      </div>
-    ))}
-  </div>
-</div>
-
+                            <p className="text-xs mt-2">{preview.name}</p>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
 
                 <div className="mb-6">
                   <label className="mb-2.5 block text-black dark:text-white">
