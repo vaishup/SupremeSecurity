@@ -340,7 +340,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                   }}
                 >
                   <SquareUser width={18} height={18} />
-                  Staffs
+                  Staff
                 </NavLink>
               </li>
               {/* <li>
