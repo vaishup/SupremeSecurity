@@ -1,6 +1,76 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
+export const getThePost = /* GraphQL */ `
+  query GetThePost($id: ID!) {
+    getThePost(id: $id) {
+      id
+      note
+      date
+      clientID
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const listThePosts = /* GraphQL */ `
+  query ListThePosts(
+    $filter: ModelThePostFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    listThePosts(filter: $filter, limit: $limit, nextToken: $nextToken) {
+      items {
+        id
+        note
+        date
+        clientID
+        createdAt
+        updatedAt
+        __typename
+      }
+      nextToken
+      __typename
+    }
+  }
+`;
+export const getTheResident = /* GraphQL */ `
+  query GetTheResident($id: ID!) {
+    getTheResident(id: $id) {
+      id
+      Name
+      phoneNo
+      address
+      clientID
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const listTheResidents = /* GraphQL */ `
+  query ListTheResidents(
+    $filter: ModelTheResidentFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    listTheResidents(filter: $filter, limit: $limit, nextToken: $nextToken) {
+      items {
+        id
+        Name
+        phoneNo
+        address
+        clientID
+        createdAt
+        updatedAt
+        __typename
+      }
+      nextToken
+      __typename
+    }
+  }
+`;
 export const getTheClient = /* GraphQL */ `
   query GetTheClient($id: ID!) {
     getTheClient(id: $id) {
@@ -100,6 +170,7 @@ export const getTheStaff = /* GraphQL */ `
         theClientTheIncidentsId
         __typename
       }
+      staffType
       createdAt
       updatedAt
       __typename
@@ -123,6 +194,7 @@ export const listTheStaffs = /* GraphQL */ `
         theClientID
         address
         clientIds
+        staffType
         createdAt
         updatedAt
         __typename
@@ -157,6 +229,7 @@ export const theStaffsByTheClientID = /* GraphQL */ `
         theClientID
         address
         clientIds
+        staffType
         createdAt
         updatedAt
         __typename
@@ -242,6 +315,7 @@ export const getTheIncidents = /* GraphQL */ `
         theClientID
         address
         clientIds
+        staffType
         createdAt
         updatedAt
         __typename

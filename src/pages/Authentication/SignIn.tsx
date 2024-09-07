@@ -200,7 +200,9 @@ const SignIn: React.FC<SignInProps> = ({ onLoginSuccess }) => {
                     className="w-full cursor-pointer rounded-lg border border-primary bg-primary p-4 text-white transition hover:bg-opacity-90"
                   />
                 </div>
-
+                {errorMsg && (
+                <p className="text-red-500 text-sm mt-1">{errorMsg}</p>
+              )}
                 <div className="mt-6 text-center">
                   <p>
                     Don’t have any account?{" "}

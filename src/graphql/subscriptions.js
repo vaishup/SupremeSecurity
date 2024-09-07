@@ -1,6 +1,93 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
+export const onCreateThePost = /* GraphQL */ `
+  subscription OnCreateThePost($filter: ModelSubscriptionThePostFilterInput) {
+    onCreateThePost(filter: $filter) {
+      id
+      note
+      date
+      clientID
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onUpdateThePost = /* GraphQL */ `
+  subscription OnUpdateThePost($filter: ModelSubscriptionThePostFilterInput) {
+    onUpdateThePost(filter: $filter) {
+      id
+      note
+      date
+      clientID
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onDeleteThePost = /* GraphQL */ `
+  subscription OnDeleteThePost($filter: ModelSubscriptionThePostFilterInput) {
+    onDeleteThePost(filter: $filter) {
+      id
+      note
+      date
+      clientID
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onCreateTheResident = /* GraphQL */ `
+  subscription OnCreateTheResident(
+    $filter: ModelSubscriptionTheResidentFilterInput
+  ) {
+    onCreateTheResident(filter: $filter) {
+      id
+      Name
+      phoneNo
+      address
+      clientID
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onUpdateTheResident = /* GraphQL */ `
+  subscription OnUpdateTheResident(
+    $filter: ModelSubscriptionTheResidentFilterInput
+  ) {
+    onUpdateTheResident(filter: $filter) {
+      id
+      Name
+      phoneNo
+      address
+      clientID
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onDeleteTheResident = /* GraphQL */ `
+  subscription OnDeleteTheResident(
+    $filter: ModelSubscriptionTheResidentFilterInput
+  ) {
+    onDeleteTheResident(filter: $filter) {
+      id
+      Name
+      phoneNo
+      address
+      clientID
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
 export const onCreateTheClient = /* GraphQL */ `
   subscription OnCreateTheClient(
     $filter: ModelSubscriptionTheClientFilterInput
@@ -164,6 +251,7 @@ export const onCreateTheStaff = /* GraphQL */ `
         theClientTheIncidentsId
         __typename
       }
+      staffType
       createdAt
       updatedAt
       __typename
@@ -198,6 +286,7 @@ export const onUpdateTheStaff = /* GraphQL */ `
         theClientTheIncidentsId
         __typename
       }
+      staffType
       createdAt
       updatedAt
       __typename
@@ -232,6 +321,7 @@ export const onDeleteTheStaff = /* GraphQL */ `
         theClientTheIncidentsId
         __typename
       }
+      staffType
       createdAt
       updatedAt
       __typename
@@ -355,6 +445,7 @@ export const onCreateTheIncidents = /* GraphQL */ `
         theClientID
         address
         clientIds
+        staffType
         createdAt
         updatedAt
         __typename
@@ -426,6 +517,7 @@ export const onUpdateTheIncidents = /* GraphQL */ `
         theClientID
         address
         clientIds
+        staffType
         createdAt
         updatedAt
         __typename
@@ -497,6 +589,7 @@ export const onDeleteTheIncidents = /* GraphQL */ `
         theClientID
         address
         clientIds
+        staffType
         createdAt
         updatedAt
         __typename

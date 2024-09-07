@@ -1,6 +1,105 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
+export const createThePost = /* GraphQL */ `
+  mutation CreateThePost(
+    $input: CreateThePostInput!
+    $condition: ModelThePostConditionInput
+  ) {
+    createThePost(input: $input, condition: $condition) {
+      id
+      note
+      date
+      clientID
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const updateThePost = /* GraphQL */ `
+  mutation UpdateThePost(
+    $input: UpdateThePostInput!
+    $condition: ModelThePostConditionInput
+  ) {
+    updateThePost(input: $input, condition: $condition) {
+      id
+      note
+      date
+      clientID
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const deleteThePost = /* GraphQL */ `
+  mutation DeleteThePost(
+    $input: DeleteThePostInput!
+    $condition: ModelThePostConditionInput
+  ) {
+    deleteThePost(input: $input, condition: $condition) {
+      id
+      note
+      date
+      clientID
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const createTheResident = /* GraphQL */ `
+  mutation CreateTheResident(
+    $input: CreateTheResidentInput!
+    $condition: ModelTheResidentConditionInput
+  ) {
+    createTheResident(input: $input, condition: $condition) {
+      id
+      Name
+      phoneNo
+      address
+      clientID
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const updateTheResident = /* GraphQL */ `
+  mutation UpdateTheResident(
+    $input: UpdateTheResidentInput!
+    $condition: ModelTheResidentConditionInput
+  ) {
+    updateTheResident(input: $input, condition: $condition) {
+      id
+      Name
+      phoneNo
+      address
+      clientID
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const deleteTheResident = /* GraphQL */ `
+  mutation DeleteTheResident(
+    $input: DeleteTheResidentInput!
+    $condition: ModelTheResidentConditionInput
+  ) {
+    deleteTheResident(input: $input, condition: $condition) {
+      id
+      Name
+      phoneNo
+      address
+      clientID
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
 export const createTheClient = /* GraphQL */ `
   mutation CreateTheClient(
     $input: CreateTheClientInput!
@@ -170,6 +269,7 @@ export const createTheStaff = /* GraphQL */ `
         theClientTheIncidentsId
         __typename
       }
+      staffType
       createdAt
       updatedAt
       __typename
@@ -207,6 +307,7 @@ export const updateTheStaff = /* GraphQL */ `
         theClientTheIncidentsId
         __typename
       }
+      staffType
       createdAt
       updatedAt
       __typename
@@ -244,6 +345,7 @@ export const deleteTheStaff = /* GraphQL */ `
         theClientTheIncidentsId
         __typename
       }
+      staffType
       createdAt
       updatedAt
       __typename
@@ -377,6 +479,7 @@ export const createTheIncidents = /* GraphQL */ `
         theClientID
         address
         clientIds
+        staffType
         createdAt
         updatedAt
         __typename
@@ -449,6 +552,7 @@ export const updateTheIncidents = /* GraphQL */ `
         theClientID
         address
         clientIds
+        staffType
         createdAt
         updatedAt
         __typename
@@ -521,6 +625,7 @@ export const deleteTheIncidents = /* GraphQL */ `
         theClientID
         address
         clientIds
+        staffType
         createdAt
         updatedAt
         __typename

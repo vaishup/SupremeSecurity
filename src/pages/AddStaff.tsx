@@ -25,6 +25,7 @@ const AddStaff = () => {
     phoneNumber: '',
     joiningDate: '',
     userName: '',
+    staffType: '',
   });
 
   useEffect(() => {
@@ -47,6 +48,7 @@ const AddStaff = () => {
             phoneNumber: staff.phoneno,
             joiningDate: staff.joiningdate,
             userName: staff.userName,
+            staffType: staff.staffType,
           });
         } catch (error) {
           console.error('Error fetching staff data:', error);
@@ -56,6 +58,7 @@ const AddStaff = () => {
       fetchStaffData();
     }
   }, [id]);
+
   // State to manage form validation errors
   const [errors, setErrors] = useState({});
   const [ids, setId] = useState();
@@ -87,21 +90,26 @@ const AddStaff = () => {
     if (!formData.lastName) errors.lastName = 'Last name is required';
     if (!formData.email) errors.email = 'Email is required';
     if (!formData.phoneNumber) errors.phoneNumber = 'Phone number is required';
+    if (!formData.staffType) errors.staffType = 'Please Select Staff Type';
     return errors;
   };
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsOpen(true);
+    // Step 1: Perform validation
+    const validationErrors = validate(); // Assume validate() is a function that returns an object of errors
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors); // Set the errors in state to display in the UI
+      return; // Stop the form submission if validation fails
+    }
     try {
-      // Step 2: Create PatientOrder
+      // Step 2: Create the input object for staff creation or update
       const staffInput = {
         fname: formData.firstName,
         phoneno: formData.phoneNumber,
         lname: formData.lastName,
         email: formData.email,
         joiningdate: formData.joiningDate,
-        // address:formData.address,
-        // Mapping to 'frequency' field
+        // Add other fields as needed
       };
       let staffResponse;
       if (id) {
@@ -117,17 +125,19 @@ const AddStaff = () => {
           variables: { input: staffInput },
         });
       }
-      const createdItem = staffResponse.data.createTheStaff;
-      console.log(createdItem.id, 'suceesfully created');
-      setId(createdItem.id);
-      //navigation("/staffList");
+      // Step 3: Handle the response and navigation
+      const createdItem = staffResponse.data.createTheStaff || staffResponse.data.updateTheStaff;
+      console.log(createdItem.id, 'successfully created/updated');
+      setId(createdItem.id); // Set the ID if it's a new creation
+      // Step 4: Show success message and optionally navigate
       setIsOpen(true);
-      // Add logic here to submit the taskData to your backend or API
+      // navigation("/staffList"); // Uncomment this if you want to navigate to the staff list page after submission
     } catch (error) {
-      console.error('Error creating PatientOrder:', error);
-      throw new Error('Failed to create PatientOrder');
+      console.error('Error creating or updating staff:', error);
+      // Handle the error (display message, etc.)
     }
   };
+  
   const [isOpen, setIsOpen] = useState(false);
   const [show, setIsShow] = useState(false);
   const handleDialogue = () => {
@@ -308,6 +318,27 @@ const AddStaff = () => {
                     onChange={handleChange}
                     className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
                   /> */}
+                </div>
+
+                <div className="mb-6">
+                  <label className="mb-2.5 block text-black dark:text-white">
+                    Staff Type
+                  </label>
+                  <select
+                    name="staffType"
+                    value={formData.staffType}
+                    onChange={handleChange}
+                    className={`w-full rounded-lg border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary ${errors.frequency ? 'border-red-500' : ''} dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary`}
+                  >
+                    <option value="">Select Staff Type</option>
+                    <option value="driver">Driver</option>
+                    <option value="security">Security</option>
+                  </select>
+                  {errors.staffType && (
+                    <p className="text-red-500 text-sm mt-1">
+                      {errors.staffType}
+                    </p>
+                  )}
                 </div>
                 {/* <div className="w-full xl:w-1/2">
                   <label className="mb-2.5 block text-black dark:text-white">

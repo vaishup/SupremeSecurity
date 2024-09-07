@@ -42,7 +42,7 @@ const AddTask = () => {
 
   // State to manage form inputs
   const [taskData, setTaskData] = useState<TaskData>({
-    title: "",
+    title: "",\
     description: "",
     frequency: "",
     clientId: "",
@@ -149,12 +149,16 @@ const AddTask = () => {
         clientId: taskData.clientId,
       };
       let taskResponse;
-      if (id !== "null") {
+      if (id ) {
+        console.log(id);
+        
         taskResponse = await API.graphql({
           query: mutation.updateTask,
           variables: { input: { id, ...taskInput } },
         });
       } else {
+        console.log("sds",id);
+        
         taskResponse = await API.graphql({
           query: mutation.createTask,
           variables: { input: taskInput },

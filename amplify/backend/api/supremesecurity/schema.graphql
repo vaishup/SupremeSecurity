@@ -1,4 +1,19 @@
-type theClient @model @auth(rules: [{ allow: public }]) {
+type ThePost @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  note: String
+  date: String
+  clientID: String
+}
+
+type TheResident @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  Name: String
+  phoneNo: String
+  address: String
+  clientID: String
+}
+
+type theClient @model @auth(rules: [{allow: public}]) {
   id: ID!
   name: String!
   phoneno: String
@@ -9,11 +24,11 @@ type theClient @model @auth(rules: [{ allow: public }]) {
   note: String
   attachments: [String]
   staffids: [String]
-  theStaff: [theStaff] @hasMany(indexName: "byTheClient", fields: ["id"]) # The correct field name
+  theStaff: [theStaff] @hasMany(indexName: "byTheClient", fields: ["id"])
   theIncidents: theIncidents @belongsTo
 }
 
-type theStaff @model @auth(rules: [{ allow: public }]) {
+type theStaff @model @auth(rules: [{allow: public}]) {
   id: ID!
   fname: String!
   phoneno: String
@@ -24,9 +39,10 @@ type theStaff @model @auth(rules: [{ allow: public }]) {
   address: String
   clientIds: [String]
   theClient: theClient @belongsTo(fields: ["theClientID"])
+  staffType: String
 }
 
-type Task @model @auth(rules: [{ allow: public }]) {
+type Task @model @auth(rules: [{allow: public}]) {
   id: ID!
   title: String!
   description: String
@@ -35,7 +51,7 @@ type Task @model @auth(rules: [{ allow: public }]) {
   clientId: String
 }
 
-type theIncidents @model @auth(rules: [{ allow: public }]) {
+type theIncidents @model @auth(rules: [{allow: public}]) {
   id: ID!
   title: String!
   description: String
@@ -52,10 +68,11 @@ type theIncidents @model @auth(rules: [{ allow: public }]) {
   bytheClientID: theClient @hasOne
 }
 
-type user @model @auth(rules: [{ allow: public }]) {
+type user @model @auth(rules: [{allow: public}]) {
   id: ID!
   name: String
   email: String
   phoneNo: String
   userType: String
 }
+ 
