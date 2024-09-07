@@ -1,3 +1,9 @@
+type TheNote @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  note: String
+  clientID: String
+}
+
 type ThePost @model @auth(rules: [{allow: public}]) {
   id: ID!
   note: String
@@ -26,6 +32,8 @@ type theClient @model @auth(rules: [{allow: public}]) {
   staffids: [String]
   theStaff: [theStaff] @hasMany(indexName: "byTheClient", fields: ["id"])
   theIncidents: theIncidents @belongsTo
+  count: String
+  countInt: Int
 }
 
 type theStaff @model @auth(rules: [{allow: public}]) {

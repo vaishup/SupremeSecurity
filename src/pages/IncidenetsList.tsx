@@ -118,8 +118,10 @@ const IncidenetsList = () => {
       // const pendingTasks = tasksWithClientName.filter(
       //   (task) => task.status === "pending"
       // );
-
-      setIncidentList(tasksWithClientName);
+      const sortedTasks = tasksWithClientName.sort((a, b) =>
+      new Date(b.createdAt) - new Date(a.createdAt)
+    );
+      setIncidentList(sortedTasks);
     } catch (error) {
       console.error('Error fetching driver details:', error);
     }
@@ -185,7 +187,7 @@ const IncidenetsList = () => {
                   Client Name
                 </th>
                 <th className="px-6 py-3 border-b border-gray-200 text-white text-left text-sm uppercase font-bold">
-                  CreatedAt
+                  Created Date
                 </th>
 
                 <th className="px-6 py-3 border-b border-gray-200 text-white text-left text-sm uppercase font-bold">

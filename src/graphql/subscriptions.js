@@ -1,6 +1,42 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
+export const onCreateTheNote = /* GraphQL */ `
+  subscription OnCreateTheNote($filter: ModelSubscriptionTheNoteFilterInput) {
+    onCreateTheNote(filter: $filter) {
+      id
+      note
+      clientID
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onUpdateTheNote = /* GraphQL */ `
+  subscription OnUpdateTheNote($filter: ModelSubscriptionTheNoteFilterInput) {
+    onUpdateTheNote(filter: $filter) {
+      id
+      note
+      clientID
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onDeleteTheNote = /* GraphQL */ `
+  subscription OnDeleteTheNote($filter: ModelSubscriptionTheNoteFilterInput) {
+    onDeleteTheNote(filter: $filter) {
+      id
+      note
+      clientID
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
 export const onCreateThePost = /* GraphQL */ `
   subscription OnCreateThePost($filter: ModelSubscriptionThePostFilterInput) {
     onCreateThePost(filter: $filter) {
@@ -126,6 +162,8 @@ export const onCreateTheClient = /* GraphQL */ `
         theIncidentsBytheClientIDId
         __typename
       }
+      count
+      countInt
       createdAt
       updatedAt
       theClientTheIncidentsId
@@ -171,6 +209,8 @@ export const onUpdateTheClient = /* GraphQL */ `
         theIncidentsBytheClientIDId
         __typename
       }
+      count
+      countInt
       createdAt
       updatedAt
       theClientTheIncidentsId
@@ -216,6 +256,8 @@ export const onDeleteTheClient = /* GraphQL */ `
         theIncidentsBytheClientIDId
         __typename
       }
+      count
+      countInt
       createdAt
       updatedAt
       theClientTheIncidentsId
@@ -246,6 +288,8 @@ export const onCreateTheStaff = /* GraphQL */ `
         note
         attachments
         staffids
+        count
+        countInt
         createdAt
         updatedAt
         theClientTheIncidentsId
@@ -281,6 +325,8 @@ export const onUpdateTheStaff = /* GraphQL */ `
         note
         attachments
         staffids
+        count
+        countInt
         createdAt
         updatedAt
         theClientTheIncidentsId
@@ -316,6 +362,8 @@ export const onDeleteTheStaff = /* GraphQL */ `
         note
         attachments
         staffids
+        count
+        countInt
         createdAt
         updatedAt
         theClientTheIncidentsId
@@ -346,6 +394,8 @@ export const onCreateTask = /* GraphQL */ `
         note
         attachments
         staffids
+        count
+        countInt
         createdAt
         updatedAt
         theClientTheIncidentsId
@@ -377,6 +427,8 @@ export const onUpdateTask = /* GraphQL */ `
         note
         attachments
         staffids
+        count
+        countInt
         createdAt
         updatedAt
         theClientTheIncidentsId
@@ -408,6 +460,8 @@ export const onDeleteTask = /* GraphQL */ `
         note
         attachments
         staffids
+        count
+        countInt
         createdAt
         updatedAt
         theClientTheIncidentsId
@@ -463,6 +517,8 @@ export const onCreateTheIncidents = /* GraphQL */ `
         note
         attachments
         staffids
+        count
+        countInt
         createdAt
         updatedAt
         theClientTheIncidentsId
@@ -479,6 +535,8 @@ export const onCreateTheIncidents = /* GraphQL */ `
         note
         attachments
         staffids
+        count
+        countInt
         createdAt
         updatedAt
         theClientTheIncidentsId
@@ -535,6 +593,8 @@ export const onUpdateTheIncidents = /* GraphQL */ `
         note
         attachments
         staffids
+        count
+        countInt
         createdAt
         updatedAt
         theClientTheIncidentsId
@@ -551,6 +611,8 @@ export const onUpdateTheIncidents = /* GraphQL */ `
         note
         attachments
         staffids
+        count
+        countInt
         createdAt
         updatedAt
         theClientTheIncidentsId
@@ -607,6 +669,8 @@ export const onDeleteTheIncidents = /* GraphQL */ `
         note
         attachments
         staffids
+        count
+        countInt
         createdAt
         updatedAt
         theClientTheIncidentsId
@@ -623,6 +687,8 @@ export const onDeleteTheIncidents = /* GraphQL */ `
         note
         attachments
         staffids
+        count
+        countInt
         createdAt
         updatedAt
         theClientTheIncidentsId

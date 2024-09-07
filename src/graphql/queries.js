@@ -1,6 +1,38 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
+export const getTheNote = /* GraphQL */ `
+  query GetTheNote($id: ID!) {
+    getTheNote(id: $id) {
+      id
+      note
+      clientID
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const listTheNotes = /* GraphQL */ `
+  query ListTheNotes(
+    $filter: ModelTheNoteFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    listTheNotes(filter: $filter, limit: $limit, nextToken: $nextToken) {
+      items {
+        id
+        note
+        clientID
+        createdAt
+        updatedAt
+        __typename
+      }
+      nextToken
+      __typename
+    }
+  }
+`;
 export const getThePost = /* GraphQL */ `
   query GetThePost($id: ID!) {
     getThePost(id: $id) {
@@ -107,6 +139,8 @@ export const getTheClient = /* GraphQL */ `
         theIncidentsBytheClientIDId
         __typename
       }
+      count
+      countInt
       createdAt
       updatedAt
       theClientTheIncidentsId
@@ -132,6 +166,8 @@ export const listTheClients = /* GraphQL */ `
         note
         attachments
         staffids
+        count
+        countInt
         createdAt
         updatedAt
         theClientTheIncidentsId
@@ -165,6 +201,8 @@ export const getTheStaff = /* GraphQL */ `
         note
         attachments
         staffids
+        count
+        countInt
         createdAt
         updatedAt
         theClientTheIncidentsId
@@ -257,6 +295,8 @@ export const getTask = /* GraphQL */ `
         note
         attachments
         staffids
+        count
+        countInt
         createdAt
         updatedAt
         theClientTheIncidentsId
@@ -333,6 +373,8 @@ export const getTheIncidents = /* GraphQL */ `
         note
         attachments
         staffids
+        count
+        countInt
         createdAt
         updatedAt
         theClientTheIncidentsId
@@ -349,6 +391,8 @@ export const getTheIncidents = /* GraphQL */ `
         note
         attachments
         staffids
+        count
+        countInt
         createdAt
         updatedAt
         theClientTheIncidentsId

@@ -136,7 +136,10 @@ const StaffList = () => {
         variables: {},
       });
       const staffList = staffdata.data.listTheStaffs.items;
-      setStaffList(staffList);
+      const sortedTasks = staffList.sort((a, b) =>
+      new Date(b.createdAt) - new Date(a.createdAt)
+    );
+      setStaffList(sortedTasks);
       console.log('staffList---', staffList);
     } catch (error) {
       console.error('Error fetching driver details:', error);

@@ -13,6 +13,7 @@ import {
   getTheStaff,
   listThePosts,
   listTheResidents,
+  listTheNotes,
   theStaffsByTheClientID,
   theStafftheClientsByTheClientId,
 } from '../graphql/queries';
@@ -60,6 +61,8 @@ const ClientDetails = () => {
   const [postList, setPost] = useState([]);
   const [residentList, setResident] = useState([]);
   const [staffList, setStaffList] = useState([]);
+  const [noteList, setNoteList] = useState([]);
+
   const getS3Url = async (key) => {
     try {
       const getUrlResult = await getUrl({
@@ -163,6 +166,7 @@ const ClientDetails = () => {
       listTheIncidentss(id);
       listResidents(id);
       listPost(id);
+      listNote(id);
     }
   }, [id]);
 
@@ -180,8 +184,10 @@ const ClientDetails = () => {
       });
       const incidentData = response.data.listTheIncidents;
       console.log('incidentData', incidentData);
-
-      setIncidentList(incidentData.items);
+      const sortedTasks = incidentData.sort((a, b) =>
+      new Date(b.createdAt) - new Date(a.createdAt)
+    );
+      setIncidentList(sortedTasks.items);
     } catch (error) {
       console.error('Error fetching incidentData:', error);
       setLoading(false);
@@ -206,7 +212,10 @@ const ClientDetails = () => {
       const clientData = response.data.listTasks;
       console.log('clientData', clientData);
       // Set the client data to state
-      setTskist(clientData.items);
+      const sortedTasks = clientData.items.sort((a, b) =>
+      new Date(b.createdAt) - new Date(a.createdAt)
+    );
+      setTskist(sortedTasks);
       setLoading(false); // Ensure you're setting the items array to state
     } catch (error) {
       console.error('Error fetching listTask:', error);
@@ -228,8 +237,11 @@ const ClientDetails = () => {
       // Access the correct property from the response
       const clientData = response.data.listThePosts;
       console.log('clientData', clientData);
+      const sortedTasks = clientData.items.sort((a, b) =>
+      new Date(b.createdAt) - new Date(a.createdAt)
+    );
       // Set the client data to state
-      setPost(clientData.items);
+      setPost(sortedTasks);
       setLoading(false); // Ensure you're setting the items array to state
     } catch (error) {
       console.error('Error fetching listPost', error);
@@ -254,8 +266,38 @@ const ClientDetails = () => {
       // Access the correct property from the response
       const clientData = response.data.listTheResidents;
       console.log('listResidents', clientData);
+
+      const sortedTasks = clientData.items.sort((a, b) =>
+      new Date(b.createdAt) - new Date(a.createdAt)
+    );
       // Set the client data to state
-      setResident(clientData.items);
+      setResident(sortedTasks);
+      setLoading(false); // Ensure you're setting the items array to state
+    } catch (error) {
+      console.error('Error fetching listResidents:', error);
+      setLoading(false);
+    }
+  };
+  const listNote = async (id) => {
+    try {
+      const response = await client.graphql({
+        query: listTheNotes,
+        variables: {
+          filter: {
+            clientID: {
+              eq: id,
+            },
+          },
+        },
+      });
+      // Access the correct property from the response
+      const clientData = response.data.listTheNotes;
+      console.log('listResidents', clientData);
+      const sortedTasks = clientData.items.sort((a, b) =>
+      new Date(b.createdAt) - new Date(a.createdAt)
+    );
+      // Set the client data to state
+      setNoteList(sortedTasks);
       setLoading(false); // Ensure you're setting the items array to state
     } catch (error) {
       console.error('Error fetching listResidents:', error);
@@ -287,7 +329,18 @@ const ClientDetails = () => {
     return errors;
   };
   const API = generateClient();
-
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const options = {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true,
+    };
+    return date.toLocaleString('en-US', options);
+  };
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     // Step 1: Perform validation
@@ -340,12 +393,20 @@ const ClientDetails = () => {
     //   setErrors('Please Enter Note');
     //   return;
     // }
+
+    if (!note) {
+      setErrors({ note: 'Note is required' });
+      return;
+    }
+    console.log('error note...', errors.note);
+
+    // Clear errors and proceed with form submission
+    setErrors({});
     try {
       // Step 2: Create the input object for staff creation or update
       const noteInput = {
         note: note,
         clientID: id,
-
         // Add other fields as needed
       };
       let noteResponse;
@@ -366,9 +427,23 @@ const ClientDetails = () => {
       // Step 3: Handle the response and navigation
       const createdItem =
         noteResponse.data.createThePost || noteResponse.data.updateThePost;
+        try {
+        const updateInput = {
+          id: id,
+          count: "1",
+        };
+        await API.graphql({
+          query: mutation.updateTheClient,
+          variables: { input: updateInput },
+        });
+        console.log(createdItem, 'suceesfully created');
+      } catch (error) {
+        console.error('Error uploading file:', error);
+        // Handle the error (e.g., display error message to user)
+      }
       console.log(createdItem.id, 'successfully created/updated');
-
-      setIsOpenPost(false);
+      setNote('');
+      //setIsOpenPost(false);
     } catch (error) {
       console.error('Error creating or updating staff:', error);
       // Handle the error (display message, etc.)
@@ -695,17 +770,22 @@ const ClientDetails = () => {
                       <div className="flex flex-col  xl:flex-row">
                         <div className="w-full mt-4 ">
                           <label className="block text-black dark:text-white">
-                            Note<span className="text-meta-1">*</span>
+                            Post<span className="text-meta-1">*</span>
                           </label>
                           <input
                             value={note}
                             onChange={(e) => setNote(e.target.value)}
                             type="text"
-                            name="firstName"
-                            placeholder="Enter your first name"
+                            name="post"
+                            placeholder="Enter your Post"
                             className={`w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary ${errors.firstName ? 'border-red-500' : ''} dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary`}
                           />
                         </div>
+                        {errors.note && (
+                          <p className="text-red-500 text-sm mt-1">
+                            {errors.note}
+                          </p>
+                        )}
                       </div>
                       {/* {errors && (
                         <p className="text-red-500 text-sm mt-1">
@@ -818,7 +898,7 @@ const ClientDetails = () => {
                           {order.note}
                         </td>
                         <td className="px-6 py-4 border-b border-gray-200 bg-white text-sm w-1/2 text-right">
-                          {order.createdAt}
+                          {formatDate(order.createdAt)}
                         </td>
                       </tr>
                     ))}
@@ -838,43 +918,43 @@ const ClientDetails = () => {
         <div className="flex flex-col">
           <div className="w-full h-full">
             {/* Tab Navigation */}
-            <div className="border-b flex mt-4 pl-3">
+            <div className="border-b p-3 flex pl-3">
               <button
                 onClick={() => handleTabClick('ResList')}
-                className={`w-full px-4 py-2 uppercase text-black font-bold font-lg border-b-2 ${
+                className={`w-full px-4 py-2 uppercase text-black  p-3 font-bold border-b-2 rounded-lg shadow-sm transition duration-300 ${
                   activeTab === 'ResList'
-                    ? 'border-[#7a2828]'
-                    : 'border-transparent'
+                    ? 'bg-[#7a2828] text-white border-[#7a2828]'
+                    : 'bg-white text-black border-transparent hover:bg-gray-200'
                 }`}
               >
                 Resident List
               </button>
               <button
                 onClick={() => handleTabClick('TaskList')}
-                className={`w-full px-4 py-2  text-black font-bold font-lg border-b-2 ${
+                className={`w-full px-4 py-2 uppercase text-black  p-3 font-bold border-b-2 rounded-lg shadow-sm transition duration-300 ${
                   activeTab === 'TaskList'
-                    ? 'border-[#7a2828]'
-                    : 'border-transparent'
+                    ? 'bg-[#7a2828] text-white border-[#7a2828]'
+                    : 'bg-white text-black border-transparent hover:bg-gray-200'
                 }`}
               >
                 TASK LIST
               </button>
               <button
                 onClick={() => handleTabClick('IncidentList')}
-                className={`w-full ml-2 px-4 py-2 text-black font-bold font-lg border-b-2 ${
+                className={`w-full px-4 py-2 uppercase text-black  p-3 font-bold border-b-2 rounded-lg shadow-sm transition duration-300 ${
                   activeTab === 'IncidentList'
-                    ? 'border-[#7a2828]'
-                    : 'border-transparent'
+                    ? 'bg-[#7a2828] text-white border-[#7a2828]'
+                    : 'bg-white text-black border-transparent hover:bg-gray-200'
                 }`}
               >
-                INCIDENT LISTS
+                INCIDENT LIST
               </button>
               <button
                 onClick={() => handleTabClick('AssignedStaff')}
-                className={`w-full ml-2 px-4 py-2 text-black font-bold font-lg border-b-2 ${
+                className={`w-full px-4 py-2 uppercase text-black  p-3 font-bold border-b-2 rounded-lg shadow-sm transition duration-300 ${
                   activeTab === 'AssignedStaff'
-                    ? 'border-[#7a2828]'
-                    : 'border-transparent'
+                    ? 'bg-[#7a2828] text-white border-[#7a2828]'
+                    : 'bg-white text-black border-transparent hover:bg-gray-200'
                 }`}
               >
                 ASSIGNED STAFF
@@ -899,7 +979,7 @@ const ClientDetails = () => {
                           Address
                         </th>
                         <th className="px-6 py-3 border-gray-200 text-black text-left text-sm uppercase font-bold">
-                          CreatedAt
+                          Created Date
                         </th>
                       </tr>
                     </thead>
@@ -921,7 +1001,7 @@ const ClientDetails = () => {
                             {order.address}
                           </td>
                           <td className="px-6 py-4  border-gray-200  text-sm">
-                            {order.createdAt}
+                            {formatDate(order.createdAt)}
                           </td>
                         </tr>
                       ))}
@@ -966,7 +1046,7 @@ const ClientDetails = () => {
                             {order.description}
                           </td>
                           <td className="px-6 py-4  border-gray-200 text-sm">
-                            {order.updatedAt}
+                            {formatDate(order.updatedAt)}
                           </td>
                           <td className="px-6 py-4  border-gray-200 text-sm">
                             {order.frequency}
@@ -997,7 +1077,7 @@ const ClientDetails = () => {
                           Address
                         </th>
                         <th className="px-6 py-3 border-gray-200 text-black text-left text-sm uppercase font-bold">
-                          CreatedAt
+                          Created Date
                         </th>
                       </tr>
                     </thead>
@@ -1019,7 +1099,7 @@ const ClientDetails = () => {
                             {order.address}
                           </td>
                           <td className="px-6 py-4  border-gray-200  text-sm">
-                            {order.createdAt}
+                            {formatDate(order.createdAt)}
                           </td>
                         </tr>
                       ))}
@@ -1111,6 +1191,48 @@ const ClientDetails = () => {
               />
             ))}
           </div>
+        </div>
+      </div>
+
+      <div className="mt-10 w-1/2 h-full bg-white shadow-lg rounded-sm border border-stroke dark:border-strokedark dark:bg-boxdark">
+        <div className="flex flex-col">
+          <h4 className="border-b  border-stroke p-4 font-medium text-xl text-black dark:text-white">
+            Staff's Notes
+          </h4>
+          {noteList.length > 0 ? (
+  <table className="min-w-full bg-white shadow overflow-hidden">
+    <thead className="bg-gray-100">
+      <tr>
+        <th className="px-6 py-3 border-gray-200 text-black text-left text-sm uppercase font-bold">
+          Notes
+        </th>
+        <th className="text-right px-6 py-3 border-gray-200 text-black text-left text-sm uppercase font-bold">
+          Created Date
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      {noteList.map((order, index) => (
+        <tr
+          key={order.id}
+          className={index % 2 === 0 ? 'bg-[#f2f2f2]' : 'bg-white'}
+        >
+          <td className="px-6 py-4 border-gray-200 text-sm">
+            {order.note}
+          </td>
+          <td className="px-6 py-4 text-right border-gray-200 text-sm">
+            {formatDate(order.createdAt)}
+          </td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+) : (
+  <div className="text-center text-gray-500 py-10">
+    No data found
+  </div>
+)}
+
         </div>
       </div>
     </>

@@ -50,7 +50,10 @@ const ClientList = () => {
         variables: {},
       });
       const clientData = staffdata.data.listTheClients.items;
-      setClientList(clientData);
+      const sortedTasks = clientData.sort((a, b) =>
+      new Date(b.createdAt) - new Date(a.createdAt)
+    );
+      setClientList(sortedTasks);
     } catch (error) {
       console.error('Error fetching driver details:', error);
     }

@@ -6,6 +6,8 @@
 
 export { default as TaskCreateForm } from "./TaskCreateForm";
 export { default as TaskUpdateForm } from "./TaskUpdateForm";
+export { default as TheNoteCreateForm } from "./TheNoteCreateForm";
+export { default as TheNoteUpdateForm } from "./TheNoteUpdateForm";
 export { default as ThePostCreateForm } from "./ThePostCreateForm";
 export { default as ThePostUpdateForm } from "./ThePostUpdateForm";
 export { default as TheResidentCreateForm } from "./TheResidentCreateForm";

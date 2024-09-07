@@ -12,48 +12,18 @@ import {
 import * as mutation from "../graphql/mutations.js";
 
 const TaskList = () => {
-  const tasks = [
-    {
-      id: "001",
-      title: "Daily Backup",
-      description:
-        "Perform daily backup of all databases and critical systems.",
-      frequency: "Daily",
-      createdDate: "2024-08-14",
-    },
-    {
-      id: "002",
-      title: "Weekly Security Audit",
-      description:
-        "Conduct a weekly audit of all security protocols and update any necessary patches.",
-      frequency: "Weekly",
-      createdDate: "2024-08-07",
-    },
-    {
-      id: "003",
-      title: "Monthly Report Generation",
-      description:
-        "Generate and submit monthly performance and financial reports to the management team.",
-      frequency: "Monthly",
-      createdDate: "2024-08-01",
-    },
-    {
-      id: "004",
-      title: "Quarterly System Maintenance",
-      description:
-        "Carry out quarterly maintenance of all physical and virtual servers.",
-      frequency: "Quarterly",
-      createdDate: "2024-07-15",
-    },
-    {
-      id: "005",
-      title: "Annual Disaster Recovery Test",
-      description:
-        "Perform an annual test of the disaster recovery plan to ensure readiness in case of an emergency.",
-      frequency: "Annually",
-      createdDate: "2024-01-10",
-    },
-  ];
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const options = {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true,
+    };
+    return date.toLocaleString('en-US', options);
+  };
   const [taskList, setTaskList] = useState([]);
 
   const navigation = useNavigate();
@@ -93,9 +63,11 @@ const TaskList = () => {
           }
         })
       );
-
+      const sortedTasks = tasksWithClientName.sort((a, b) =>
+      new Date(b.createdAt) - new Date(a.createdAt)
+    );
       // Set the updated task list
-      setTaskList(tasksWithClientName);
+      setTaskList(sortedTasks);
       console.log("Tasks with Client Names:", tasksWithClientName);
     } catch (error) {
       console.error("Error fetching tasks or client details:", error);
@@ -228,7 +200,7 @@ const TaskList = () => {
                   {order.description}
                 </td>
                 <td className="px-6 py-4 border-b border-gray-200 bg-white text-sm">
-                  {order.updatedAt}
+                  {formatDate(order.updatedAt)}
                 </td>
                 <td className="px-6 py-4 border-b border-gray-200 bg-white text-sm">
                   {order.frequency}
