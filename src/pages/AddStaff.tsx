@@ -50,6 +50,9 @@ const AddStaff = () => {
             userName: staff.userName,
             staffType: staff.staffType,
           });
+          console.log("staff.joiningdate",staff.joiningdate);
+          
+          setSelectedDate(dayjs(staff.joiningdate))
         } catch (error) {
           console.error('Error fetching staff data:', error);
         }
@@ -109,6 +112,7 @@ const AddStaff = () => {
         lname: formData.lastName,
         email: formData.email,
         joiningdate: formData.joiningDate,
+        staffType:formData.staffType
         // Add other fields as needed
       };
       let staffResponse;

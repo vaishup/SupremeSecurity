@@ -18,14 +18,10 @@ const AddTask = () => {
   const [loading, setLoading] = useState(true); // Add loading state
 
   const API = generateClient();
-  const { id, clientid } = useParams();
+  const { id, clientid , tag} = useParams();
+console.log(tag);
 
-  let edit = "edit";
-  if (id === "null") {
-    edit = "add";
-  } else {
-    edit = "edit";
-  }
+
 
   // Get the staff ID from the URL, if it exists
   const navigation = useNavigate();
@@ -149,7 +145,7 @@ const AddTask = () => {
         clientId: taskData.clientId,
       };
       let taskResponse;
-      if (id) {
+      if (tag =='edit') {
         // If id exists (i.e., it's neither undefined, null, nor falsy like an empty string)
         console.log("update task", id);
       

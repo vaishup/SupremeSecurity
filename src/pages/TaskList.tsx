@@ -32,7 +32,29 @@ const TaskList = () => {
   }, []);
   const client = generateClient();
   const [searchQuery, setSearchQuery] = useState("");
-
+  const listTasks = /* GraphQL */ `
+  query ListTasks(
+    $filter: ModelTaskFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    listTasks(filter: $filter, limit: $limit, nextToken: $nextToken) {
+      items {
+        id
+        title
+        description
+        frequency
+        clientId
+        createdAt
+        updatedAt
+        taskTheClientId
+        __typename
+      }
+      nextToken
+      __typename
+    }
+  }
+`;
   const listTaskss = async () => {
     try {
       const driverData = await client.graphql({
@@ -140,7 +162,10 @@ const TaskList = () => {
           <button
             className="btn-grad w-[180px] pr-20"
             onClick={() => {
-              navigation("/addTask");
+              const addString = "add";
+navigation(`/addTask/${addString}`);
+              
+
             }}
           >
             <svg
@@ -209,7 +234,7 @@ const TaskList = () => {
                   <div className="flex flex-row">
                     <PencilIcon
                       onClick={() => {
-                        navigation(`/addTask/${order.id}`); // Navigate to AddStaff page with the staff ID
+                        navigation(`/addTask/edit/${order.id}`); // Navigate to AddStaff page with the staff ID
                       }}
                       className="mr-5 inline-block transition duration-300 ease-in-out transform hover:text-black hover:scale-110"
                       color="blue"

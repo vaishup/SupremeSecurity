@@ -30,7 +30,7 @@ const coreRoutes = [
     component: AddClient,
   },
   {
-    path: '/addTask/:id?/:clientid?',
+    path: '/addTask/:tag/:id?/:clientid?',
     title: 'AddTask',
     component: AddTask,
   },

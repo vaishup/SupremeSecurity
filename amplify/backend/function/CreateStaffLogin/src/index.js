@@ -21,7 +21,7 @@ async function sendEmail(email, username, password) {
   }));
 
   const mailOptions = {
-    from: 'vaishalipanchal6899@gmail.com', // Verified SES email
+    from: 'info@supremesecurityservices.ca', // Verified SES email
     to: email,
     subject: 'Your Account Credentials', // Subject line
     text: `Hello,
