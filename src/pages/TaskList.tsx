@@ -177,7 +177,7 @@ const TaskList = () => {
                 Description
               </th>
               <th className="px-6 py-3 border-b border-gray-200 text-white text-left text-sm uppercase font-bold">
-                Createdat
+                Created Date
               </th>
               <th className="px-6 py-3 border-b border-gray-200 text-white text-left text-sm uppercase font-bold">
                 Frequency

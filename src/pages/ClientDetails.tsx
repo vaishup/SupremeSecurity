@@ -62,6 +62,7 @@ const ClientDetails = () => {
   const [residentList, setResident] = useState([]);
   const [staffList, setStaffList] = useState([]);
   const [noteList, setNoteList] = useState([]);
+  const [count, setCount] = useState("0");
 
   const getS3Url = async (key) => {
     try {
@@ -125,7 +126,8 @@ const ClientDetails = () => {
             variables: { id },
           });
           const clientData = clientesponse.data.getTheClient;
-
+          setCount(clientData.count);
+          console.log('clientData.count', clientData.count);
           if (clientData.attachments && Array.isArray(clientData.attachments)) {
             const urls = await Promise.all(
               clientData.attachments.map(async (attachment) => {
@@ -184,9 +186,9 @@ const ClientDetails = () => {
       });
       const incidentData = response.data.listTheIncidents;
       console.log('incidentData', incidentData);
-      const sortedTasks = incidentData.sort((a, b) =>
-      new Date(b.createdAt) - new Date(a.createdAt)
-    );
+      const sortedTasks = incidentData.sort(
+        (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
+      );
       setIncidentList(sortedTasks.items);
     } catch (error) {
       console.error('Error fetching incidentData:', error);
@@ -212,9 +214,9 @@ const ClientDetails = () => {
       const clientData = response.data.listTasks;
       console.log('clientData', clientData);
       // Set the client data to state
-      const sortedTasks = clientData.items.sort((a, b) =>
-      new Date(b.createdAt) - new Date(a.createdAt)
-    );
+      const sortedTasks = clientData.items.sort(
+        (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
+      );
       setTskist(sortedTasks);
       setLoading(false); // Ensure you're setting the items array to state
     } catch (error) {
@@ -237,9 +239,9 @@ const ClientDetails = () => {
       // Access the correct property from the response
       const clientData = response.data.listThePosts;
       console.log('clientData', clientData);
-      const sortedTasks = clientData.items.sort((a, b) =>
-      new Date(b.createdAt) - new Date(a.createdAt)
-    );
+      const sortedTasks = clientData.items.sort(
+        (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
+      );
       // Set the client data to state
       setPost(sortedTasks);
       setLoading(false); // Ensure you're setting the items array to state
@@ -267,9 +269,9 @@ const ClientDetails = () => {
       const clientData = response.data.listTheResidents;
       console.log('listResidents', clientData);
 
-      const sortedTasks = clientData.items.sort((a, b) =>
-      new Date(b.createdAt) - new Date(a.createdAt)
-    );
+      const sortedTasks = clientData.items.sort(
+        (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
+      );
       // Set the client data to state
       setResident(sortedTasks);
       setLoading(false); // Ensure you're setting the items array to state
@@ -293,9 +295,9 @@ const ClientDetails = () => {
       // Access the correct property from the response
       const clientData = response.data.listTheNotes;
       console.log('listResidents', clientData);
-      const sortedTasks = clientData.items.sort((a, b) =>
-      new Date(b.createdAt) - new Date(a.createdAt)
-    );
+      const sortedTasks = clientData.items.sort(
+        (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
+      );
       // Set the client data to state
       setNoteList(sortedTasks);
       setLoading(false); // Ensure you're setting the items array to state
@@ -388,6 +390,7 @@ const ClientDetails = () => {
 
   const handleSubmitNote = async (e: React.FormEvent) => {
     e.preventDefault();
+
     // Step 1: Perform validation
     // if (note == '') {
     //   setErrors('Please Enter Note');
@@ -402,6 +405,8 @@ const ClientDetails = () => {
 
     // Clear errors and proceed with form submission
     setErrors({});
+    console.log('count..', count);
+
     try {
       // Step 2: Create the input object for staff creation or update
       const noteInput = {
@@ -422,20 +427,39 @@ const ClientDetails = () => {
         query: mutation.createThePost,
         variables: { input: noteInput },
       });
+     
+
       listPost(id);
+      // Make sure count is treated as a number
+      console.log('Original count from API:', count);
+
+      let counts = parseInt(count, 10); // Ensure count is treated as an integer
+      console.log('Parsed count as number:', counts);
+
+      // Ensure count is incremented
+      counts += 1;
+      console.log('Incremented count:', counts);
+
       // }
       // Step 3: Handle the response and navigation
       const createdItem =
         noteResponse.data.createThePost || noteResponse.data.updateThePost;
-        try {
+      try {
         const updateInput = {
           id: id,
-          count: "1",
+          count: counts,
         };
-        await API.graphql({
+        console.log('updateInput...', updateInput);
+        let taskResponse;
+        taskResponse = await API.graphql({
           query: mutation.updateTheClient,
           variables: { input: updateInput },
         });
+        setIsOpenPost(false);
+        const createdItem = taskResponse.data.updateTheClient;
+
+        //if(updateResponce)
+        
         console.log(createdItem, 'suceesfully created');
       } catch (error) {
         console.error('Error uploading file:', error);
@@ -443,7 +467,7 @@ const ClientDetails = () => {
       }
       console.log(createdItem.id, 'successfully created/updated');
       setNote('');
-      //setIsOpenPost(false);
+     
     } catch (error) {
       console.error('Error creating or updating staff:', error);
       // Handle the error (display message, etc.)
@@ -781,12 +805,12 @@ const ClientDetails = () => {
                             className={`w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary ${errors.firstName ? 'border-red-500' : ''} dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary`}
                           />
                         </div>
-                        {errors.note && (
-                          <p className="text-red-500 text-sm mt-1">
-                            {errors.note}
-                          </p>
-                        )}
                       </div>
+                      {errors.note && (
+                        <p className="text-red-500 text-sm mt-1">
+                          {errors.note}
+                        </p>
+                      )}
                       {/* {errors && (
                         <p className="text-red-500 text-sm mt-1">
                           {errors}
@@ -1200,39 +1224,36 @@ const ClientDetails = () => {
             Staff's Notes
           </h4>
           {noteList.length > 0 ? (
-  <table className="min-w-full bg-white shadow overflow-hidden">
-    <thead className="bg-gray-100">
-      <tr>
-        <th className="px-6 py-3 border-gray-200 text-black text-left text-sm uppercase font-bold">
-          Notes
-        </th>
-        <th className="text-right px-6 py-3 border-gray-200 text-black text-left text-sm uppercase font-bold">
-          Created Date
-        </th>
-      </tr>
-    </thead>
-    <tbody>
-      {noteList.map((order, index) => (
-        <tr
-          key={order.id}
-          className={index % 2 === 0 ? 'bg-[#f2f2f2]' : 'bg-white'}
-        >
-          <td className="px-6 py-4 border-gray-200 text-sm">
-            {order.note}
-          </td>
-          <td className="px-6 py-4 text-right border-gray-200 text-sm">
-            {formatDate(order.createdAt)}
-          </td>
-        </tr>
-      ))}
-    </tbody>
-  </table>
-) : (
-  <div className="text-center text-gray-500 py-10">
-    No data found
-  </div>
-)}
-
+            <table className="min-w-full bg-white shadow overflow-hidden">
+              <thead className="bg-gray-100">
+                <tr>
+                  <th className="px-6 py-3 border-gray-200 text-black text-left text-sm uppercase font-bold">
+                    Notes
+                  </th>
+                  <th className="text-right px-6 py-3 border-gray-200 text-black text-left text-sm uppercase font-bold">
+                    Created Date
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {noteList.map((order, index) => (
+                  <tr
+                    key={order.id}
+                    className={index % 2 === 0 ? 'bg-[#f2f2f2]' : 'bg-white'}
+                  >
+                    <td className="px-6 py-4 border-gray-200 text-sm">
+                      {order.note}
+                    </td>
+                    <td className="px-6 py-4 text-right border-gray-200 text-sm">
+                      {formatDate(order.createdAt)}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ) : (
+            <div className="text-center text-gray-500 py-10">No data found</div>
+          )}
         </div>
       </div>
     </>
