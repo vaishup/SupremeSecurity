@@ -117,53 +117,8 @@ const ClientDetails = () => {
   `;
   useEffect(() => {
     if (id) {
-      const fetchclientData = async () => {
-        try {
-          let clientesponse;
-
-          clientesponse = await client.graphql({
-            query: getTheClient, // Replace with your actual query to get staff by ID
-            variables: { id },
-          });
-          const clientData = clientesponse.data.getTheClient;
-          setCount(clientData.count);
-          console.log('clientData.count', clientData.count);
-          if (clientData.attachments && Array.isArray(clientData.attachments)) {
-            const urls = await Promise.all(
-              clientData.attachments.map(async (attachment) => {
-                return await getS3Url(attachment);
-              }),
-            );
-            console.log('urls...', urls);
-
-            setFilePreviews(urls);
-          }
-          setName(clientData.name);
-          setEmail(clientData.email);
-          setMobile(clientData.phoneno);
-          setContactPersonPhone(clientData.contactPersonPhone);
-          setAddress(clientData.address);
-          setBname(clientData.bname);
-
-          if (clientData.staffids && Array.isArray(clientData.staffids)) {
-            const staffMembers = await Promise.all(
-              clientData.staffids.map(async (staffId) => {
-                const staffResponse = await client.graphql({
-                  query: getTheStaff, // Replace with your actual query to get staff data
-                  variables: { id: staffId },
-                });
-                return staffResponse.data.getTheStaff;
-              }),
-            );
-            console.log('staffMembers', staffMembers);
-
-            setStaffList(staffMembers);
-          }
-        } catch (error) {
-          console.error('Error fetching staff data:', error);
-        }
-      };
-      fetchclientData();
+     
+      fetchclientData(id);
       listTask(id);
       listTheIncidentss(id);
       listResidents(id);
@@ -171,7 +126,52 @@ const ClientDetails = () => {
       listNote(id);
     }
   }, [id]);
+  const fetchclientData = async (id) => {
+    try {
+      let clientesponse;
 
+      clientesponse = await client.graphql({
+        query: getTheClient, // Replace with your actual query to get staff by ID
+        variables: { id },
+      });
+      const clientData = clientesponse.data.getTheClient;
+      setCount(clientData.count);
+      console.log('clientData.count', clientData.count);
+      if (clientData.attachments && Array.isArray(clientData.attachments)) {
+        const urls = await Promise.all(
+          clientData.attachments.map(async (attachment) => {
+            return await getS3Url(attachment);
+          }),
+        );
+        console.log('urls...', urls);
+
+        setFilePreviews(urls);
+      }
+      setName(clientData.name);
+      setEmail(clientData.email);
+      setMobile(clientData.phoneno);
+      setContactPersonPhone(clientData.contactPersonPhone);
+      setAddress(clientData.address);
+      setBname(clientData.bname);
+
+      if (clientData.staffids && Array.isArray(clientData.staffids)) {
+        const staffMembers = await Promise.all(
+          clientData.staffids.map(async (staffId) => {
+            const staffResponse = await client.graphql({
+              query: getTheStaff, // Replace with your actual query to get staff data
+              variables: { id: staffId },
+            });
+            return staffResponse.data.getTheStaff;
+          }),
+        );
+        console.log('staffMembers', staffMembers);
+
+        setStaffList(staffMembers);
+      }
+    } catch (error) {
+      console.error('Error fetching staff data:', error);
+    }
+  };
   const listTheIncidentss = async (id) => {
     try {
       const response = await client.graphql({
@@ -390,7 +390,7 @@ const ClientDetails = () => {
 
   const handleSubmitNote = async (e: React.FormEvent) => {
     e.preventDefault();
-
+    fetchclientData(id)
     // Step 1: Perform validation
     // if (note == '') {
     //   setErrors('Please Enter Note');
@@ -414,6 +414,7 @@ const ClientDetails = () => {
         clientID: id,
         // Add other fields as needed
       };
+      setIsOpenPost(false);
       let noteResponse;
       //if (id) {
       // Update existing staff member
@@ -455,12 +456,13 @@ const ClientDetails = () => {
           query: mutation.updateTheClient,
           variables: { input: updateInput },
         });
-        setIsOpenPost(false);
         const createdItem = taskResponse.data.updateTheClient;
 
         //if(updateResponce)
         
         console.log(createdItem, 'suceesfully created');
+       // setIsOpenPost(false);
+
       } catch (error) {
         console.error('Error uploading file:', error);
         // Handle the error (e.g., display error message to user)
@@ -850,7 +852,7 @@ const ClientDetails = () => {
 
                     <strong className="text-black  ml-2">{email}</strong>
                   </div>
-                </div>
+                </div>  
                 <div className="info-row">
                   {/* <div className="info-column">
                     <p>Contact Person Phone</p>
@@ -930,7 +932,8 @@ const ClientDetails = () => {
                 </table>
               ) : (
                 <div className="text-center py-10 text-gray-500">
-                  No data found
+                           <p className="text-center text-black font-bold w-full p-10">No data found</p>
+
                 </div>
               )}
             </div>
@@ -1033,7 +1036,8 @@ const ClientDetails = () => {
                   </table>
                 ) : (
                   <div className="text-center text-gray-500 py-10">
-                    No data found
+                                 <p className="text-center text-black font-bold w-full p-10">No data found</p>
+
                   </div>
                 ))}
               {activeTab === 'TaskList' &&
@@ -1081,7 +1085,8 @@ const ClientDetails = () => {
                   </table>
                 ) : (
                   <div className="text-center text-gray-500 py-10">
-                    No data found
+                                 <p className="text-center text-black font-bold w-full p-10">No data found</p>
+
                   </div>
                 ))}
 
@@ -1131,7 +1136,8 @@ const ClientDetails = () => {
                   </table>
                 ) : (
                   <div className="text-center text-gray-500 py-10">
-                    No data found
+                        <p className="text-center text-black font-bold w-full p-10">No data found</p>
+
                   </div>
                 ))}
 
@@ -1187,7 +1193,8 @@ const ClientDetails = () => {
                     </table>
                   ) : (
                     <div className="text-center py-10 text-gray-500">
-                      No data found
+                                  <p className="text-center text-black font-bold w-full p-10">No data found</p>
+
                     </div>
                   )}
                 </div>
@@ -1202,19 +1209,27 @@ const ClientDetails = () => {
             Client's Documents
           </h4>
           <div className="mt-4 flex flex-wrap gap-4">
-            <AttachmentPreviews filePreviews={filePreviews} />
+  {filePreviews.length === 0 ? (
+    <p className="text-center text-black font-bold w-full p-10">      No documents uploaded yet. 
+    </p>
+    ) : (
+    <>
+      <AttachmentPreviews filePreviews={filePreviews} />
 
-            {filePreviews.map((preview, index) => (
-              <img
-                key={index}
-                className="m-3"
-                width={120}
-                height={120}
-                src={preview}
-                alt={`Preview ${index}`}
-              />
-            ))}
-          </div>
+      {filePreviews.map((preview, index) => (
+        <img
+          key={index}
+          className="m-3"
+          width={120}
+          height={120}
+          src={preview}
+          alt={`Preview ${index}`}
+        />
+      ))}
+    </>
+  )}
+</div>
+
         </div>
       </div>
 
@@ -1252,7 +1267,10 @@ const ClientDetails = () => {
               </tbody>
             </table>
           ) : (
-            <div className="text-center text-gray-500 py-10">No data found</div>
+            <div className="text-center text-gray-500 py-10">
+               <p className="text-center text-black font-bold w-full p-10">No data found</p>
+               
+               </div>
           )}
         </div>
       </div>

@@ -25,7 +25,7 @@ const ECommerce: React.FC = () => {
 
   useEffect(() => {
     //handleLogout();
-    listAllCounts();
+   
     console.log("name", name);
   }, []);
   const handleLogout = async () => {
@@ -85,7 +85,7 @@ const ECommerce: React.FC = () => {
   useEffect(() => {
     // Define an asynchronous function to fetch the data
     fetchBatch();
-
+    listAllCounts();
     // Call the asynchronous function
   }, []);
   return (
