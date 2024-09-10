@@ -28,7 +28,7 @@ const AddClient = () => {
     note: '',
   });
   const [files, setFiles] = useState([]);
-  const [filePreviews, setFilePreviews] = useState([]);
+  const [filePreviews, setFilePreviews] = useState([]); // Ensure this is defined
   const [errors, setErrors] = useState({});
   const [clientId, setClientId] = useState();
 
@@ -99,33 +99,21 @@ const AddClient = () => {
     });
   };
 
-  const handleFileChange = (event) => {
-    const selectedFiles = Array.from(event.target.files);
-
-    setFiles(selectedFiles);
-    setFilePreviewss([...filePreviewss, ...selectedFiles]);
-
-    // Generate file previews
-    const previews = selectedFiles.map((file) => URL.createObjectURL(file));
-    setFilePreviews(previews);
-  };
-
   const handleFileChanges = (event) => {
     const selectedFiles = Array.from(event.target.files);
 
-    setFiles(selectedFiles);
-
-    // Generate file previews
+    // Generate file previews and store the actual file objects
     const previews = selectedFiles.map((file) => {
       const isImage = file.type.startsWith('image/');
       return {
+        file: file, // Store the original File object
         url: isImage ? URL.createObjectURL(file) : null, // Generate preview for image files only
         name: file.name,
         isImage: isImage, // Flag to check if the file is an image
       };
     });
 
-    setFilePreviews([...filePreviews, ...previews]); // Append the new previews to existing ones
+    setFilePreviews((prevPreviews) => [...prevPreviews, ...previews]); // Ensure appending works correctly
   };
 
   // Handle file changes
@@ -199,13 +187,15 @@ const AddClient = () => {
       //--------------------------- upload images to s3 bucket--------------------------------------
       try {
         const uploadedFiles = await Promise.all(
-          filePreviewss.map((file) => uploadToS3s(file, clientId, file.name)),
+          filePreviews.map((file) => uploadToS3s(file, clientId, file.name)),
         );
         // const uploadedFileKey = await uploadToS3(files, clientId);
         const updateInput = {
           id: clientId,
           attachments: uploadedFiles,
         };
+        console.log('updateInput..', updateInput);
+
         await API.graphql({
           query: mutation.updateTheClient,
           variables: { input: updateInput },
@@ -225,34 +215,41 @@ const AddClient = () => {
         query: mutation.createTheClient,
         variables: { input: clientInput },
       });
-      console.log(clientInput);
+      console.log('clientInput', clientInput);
+      console.log('clientesponse', clientesponse);
 
       const createdItem = clientesponse.data.createTheClient;
       const clientId = createdItem.id; // Replace with actual client ID
-      console.log('clientId...', clientId);
+      // console.log('clientId...', clientId);
+      // console.log('createdItem...', createdItem);
 
       //--------------------------- upload images to s3 bucket--------------------------------------
-      try {
-        const uploadedFiles = await Promise.all(
-          filePreviewss.map((file) => uploadToS3s(file, clientId, file.name)),
-        );
-        const updateInput = {
-          id: clientId,
-          attachments: uploadedFiles,
-        };
 
-        await API.graphql({
-          query: mutation.updateTheClient,
-          variables: { input: updateInput },
-        });
-        console.log(createdItem, 'suceesfully created');
-        setClientId(clientId);
-        setIsOpen(true);
-        // Handle the success (e.g., update UI, make further API calls)
-      } catch (error) {
-        console.error('Error uploading file:', error);
-        // Handle the error (e.g., display error message to user)
+      if (filePreviews.length > 0) {
+        // Upload files to S3 only if there are file previews
+        try {
+          const uploadedFiles = await Promise.all(
+            filePreviews.map((file) =>
+              uploadToS3s(file.file, clientId, file.name),
+            ), // Make sure to pass the file object, not the entire preview object
+          );
+
+          const updateInput = {
+            id: clientId,
+            attachments: uploadedFiles,
+          };
+          console.log('updateInput/...', updateInput);
+
+          const update = await API.graphql({
+            query: mutation.updateTheClient,
+            variables: { input: updateInput },
+          });
+          console.log(update, 'successfully updated');
+        } catch (error) {
+          console.error('Error uploading file:', error);
+        }
       }
+      setIsOpen(true);
       // navigation("/clientlist");
       // Create a new client member
     }
@@ -294,8 +291,6 @@ const AddClient = () => {
 
   const uploadToS3s = async (file, ticketId, fileName) => {
     try {
-      console.log('sds..', file, ticketId, fileName);
-
       const fullKey = `ClientImages/${ticketId}/image/${fileName}`;
 
       const result = await uploadData({
@@ -520,32 +515,41 @@ const AddClient = () => {
                     <p className="text-red-500 mt-2">{errors.fileUpload}</p>
                   )}
 
-                  <div className="mt-4 flex flex-wrap gap-4">
-                    {filePreviews.map((preview, index) => (
-                      <div key={index} className="m-3">
-                        {preview.isImage ? (
-                          <img
-                            width={120}
-                            height={120}
-                            src={preview.url}
-                            alt={`Preview ${index}`}
-                            className="rounded border border-gray-300"
-                          />
-                        ) : (
-                          <div className="flex flex-col items-center justify-center w-28 h-28 bg-gray-200  rounded">
-                            <img
-                              src={UserOne}
-                              alt="User"
-                              width={80}
-                              height={80}
-                            />
+<div className="mt-4 flex flex-wrap gap-4">
+  {/* Check if id exists, render AttachmentPreviews */}
+  {id ? (
+    <AttachmentPreviews filePreviews={filePreviews} />
+  ) : (
+    /* If id is null or doesn't exist, render the file preview */
+    filePreviews.map((preview, index) => (
+      <div key={index} className="m-3">
+        {preview.isImage ? (
+          <>
+            <img
+              width={120}
+              height={120}
+              src={preview.url}
+              alt={`Preview ${index}`}
+              className="rounded border border-gray-300"
+            />
+            <p className="text-x text-black mt-2">{preview.name}</p>
+          </>
+        ) : (
+          <div className="flex flex-col items-center justify-center w-28 h-28 bg-gray-200 rounded">
+            <img
+              src={UserOne}
+              alt="User"
+              width={80}
+              height={80}
+            />
+            <p className="text-x text-black mt-2">{preview.name}</p>
+          </div>
+        )}
+      </div>
+    ))
+  )}
+</div>
 
-                            <p className="text-xs mt-2">{preview.name}</p>
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
                 </div>
 
                 <div className="mb-6">
@@ -573,5 +577,36 @@ const AddClient = () => {
     </>
   );
 };
+const renderAttachment = (url) => {
+  // Check if the file is an image
+  const isImage = url.match(/\.(jpeg|jpg|gif|png|PNG)(\?.*)?$/);
+  if (isImage) {
+    // Render an image preview
+    return (
+      <div key={url} className="file-preview">
+        <img className="m-3" width={120} height={120} src={url} />
+        {/* <img src={url} alt="attachment" className="image-preview" /> */}
+      </div>
+    );
+  } else {
+    // Render a file icon with a download option
+    return (
+      <div key={url} className="file-preview">
+        <a href={url} download className="file-download">
+          <img src={UserOne} alt="User" width={80} height={80} />
 
+          {/* Replace with a file icon */}
+          <span>Download </span>
+        </a>
+      </div>
+    );
+  }
+};
+const AttachmentPreviews = ({ filePreviews }) => {
+  return (
+    <div className="attachment-previews">
+      {filePreviews.map((url) => renderAttachment(url))}
+    </div>
+  );
+};
 export default AddClient;

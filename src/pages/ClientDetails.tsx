@@ -308,6 +308,7 @@ const ClientDetails = () => {
   };
   // Handle form submission
   const [activeTab, setActiveTab] = useState('ResList'); // State to manage active tab
+console.log(filePreviews);
 
   const handleTabClick = (tab) => {
     setActiveTab(tab);
@@ -360,27 +361,25 @@ const ClientDetails = () => {
         clientID: id,
         // Add other fields as needed
       };
+      setIsOpen(false);
       let staffResponse;
-      //if (id) {
-      // Update existing staff member
-      // staffResponse = await API.graphql({
-      //   query: mutation.updateTheResident,
-      //   variables: { input: { id, ...residentInput } },
-      // });
-      // } else {
-      // Create a new staff member
+  
       staffResponse = await API.graphql({
         query: mutation.createTheResident,
         variables: { input: residentInput },
       });
-      setIsOpen(false);
+    
       // }
       // Step 3: Handle the response and navigation
       const createdItem =
         staffResponse.data.createTheResident ||
         staffResponse.data.updateTheResident;
       console.log(createdItem.id, 'successfully created/updated');
-
+      //setIsOpen(false);
+      setame('')
+     
+      setAdd('')
+      setPhone('')
       listResidents(id);
     } catch (error) {
       console.error('Error creating or updating staff:', error);
@@ -469,7 +468,6 @@ const ClientDetails = () => {
       }
       console.log(createdItem.id, 'successfully created/updated');
       setNote('');
-     
     } catch (error) {
       console.error('Error creating or updating staff:', error);
       // Handle the error (display message, etc.)
@@ -629,7 +627,7 @@ const ClientDetails = () => {
                           <input
                             value={phone}
                             onChange={(e) => setPhone(e.target.value)}
-                            type="text"
+                            type="phoneNumber"
                             name="phoneNumber"
                             placeholder="Enter your phone number"
                             className={`w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary ${errors.phoneNumber ? 'border-red-500' : ''} dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary`}
@@ -1216,7 +1214,7 @@ const ClientDetails = () => {
     <>
       <AttachmentPreviews filePreviews={filePreviews} />
 
-      {filePreviews.map((preview, index) => (
+      {/* {filePreviews.map((preview, index) => (
         <img
           key={index}
           className="m-3"
@@ -1225,7 +1223,7 @@ const ClientDetails = () => {
           src={preview}
           alt={`Preview ${index}`}
         />
-      ))}
+      ))} */}
     </>
   )}
 </div>
@@ -1279,13 +1277,25 @@ const ClientDetails = () => {
 };
 const renderAttachment = (url) => {
   // Check if the file is an image
-  const isImage = url.match(/\.(jpeg|jpg|gif|png)$/);
+  console.log(url);
+  
+  const isImage = url.match(/\.(jpeg|jpg|gif|png|PNG)(\?.*)?$/);
+  console.log("isImage",isImage);
 
   if (isImage) {
+console.log("isImage",isImage);
+
     // Render an image preview
     return (
       <div key={url} className="file-preview">
-        <img src={url} alt="attachment" className="image-preview" />
+
+<img
+          className="m-3"
+          width={120}
+          height={120}
+          src={url}
+        />
+        {/* <img src={url} alt="attachment" className="image-preview" /> */}
       </div>
     );
   } else {

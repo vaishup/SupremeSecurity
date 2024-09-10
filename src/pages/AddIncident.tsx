@@ -1,34 +1,34 @@
-import { useState, useEffect } from "react";
-import Breadcrumb from "../components/Breadcrumbs/Breadcrumb";
-import DefaultLayout from "../layout/DefaultLayout";
-import { ArrowUpFromLine } from "lucide-react";
+import { useState, useEffect } from 'react';
+import Breadcrumb from '../components/Breadcrumbs/Breadcrumb';
+import DefaultLayout from '../layout/DefaultLayout';
+import { ArrowUpFromLine } from 'lucide-react';
 import {
   getTableID,
   getUserInfo,
   getDriverByUserId,
-} from "../hooks/authServices";
+} from '../hooks/authServices';
 import {
   pharmacyGroupCreationRequestsByPharmacyID,
   listTheIncidents,
   getTheIncidents,
   getTheStaff,
-} from "../graphql/queries";
-import { generateClient } from "aws-amplify/api";
-import * as mutation from "../graphql/mutations.js";
-import { useParams, useNavigate } from "react-router-dom"; // Import hooks from react-router-dom
-import { uploadData } from "aws-amplify/storage";
-import { useDropzone } from "react-dropzone";
-import { getUrl } from "aws-amplify/storage";
-import { setDate } from "date-fns";
-import { Modal } from "antd";
-import { Check } from "lucide-react";
+} from '../graphql/queries';
+import { generateClient } from 'aws-amplify/api';
+import * as mutation from '../graphql/mutations.js';
+import { useParams, useNavigate } from 'react-router-dom'; // Import hooks from react-router-dom
+import { uploadData } from 'aws-amplify/storage';
+import { useDropzone } from 'react-dropzone';
+import { getUrl } from 'aws-amplify/storage';
+import { setDate } from 'date-fns';
+import { Modal } from 'antd';
+import { Check } from 'lucide-react';
 import UserOne from '../images/document.png';
 
 const AddIncident = () => {
   const [staffname, setStaffName] = useState();
   const [staffid, setStaffId] = useState();
   const [email, setEmail] = useState();
-  const [location, setLocation] = useState("");
+  const [location, setLocation] = useState('');
   const [title, setTitle] = useState();
   const [desc, setDec] = useState();
   const [dateTime, setTime] = useState();
@@ -45,8 +45,9 @@ const AddIncident = () => {
     const now = new Date();
     const formattedDateTime = now.toLocaleString(); // Formats the date and time based on the user's locale
     setTime(formattedDateTime);
+    console.log('ad....', add);
 
-    setLocation(add);
+   
   }, []);
   const client = generateClient();
 
@@ -55,14 +56,14 @@ const AddIncident = () => {
       const getUrlResult = await getUrl({
         key,
         options: {
-          accessLevel: "guest", // Change as necessary (guest, private, protected)
+          accessLevel: 'guest', // Change as necessary (guest, private, protected)
         },
       });
 
       //console.log('Fetched file URL:', getUrlResult.url.toString()); // Log the URL for verification
       return getUrlResult.url.toString(); // Ensure the URL is returned as a string
     } catch (error) {
-      console.error("Error getting S3 URL: ", error);
+      console.error('Error getting S3 URL: ', error);
       throw error;
     }
   };
@@ -89,24 +90,25 @@ const AddIncident = () => {
           });
 
           const getTheStaffs = clientData.data.getTheStaff;
-          console.log("getTheStaff", getTheStaffs);
+          console.log('getTheStaff', getTheStaffs);
 
           setStaffName(getTheStaffs.fname + getTheStaffs.lname);
           setEmail(getTheStaffs.email);
+          setStaffId(getTheStaffs.id);
           // Check if client data is available
 
           if (incident.attachments && Array.isArray(incident.attachments)) {
             const urls = await Promise.all(
               incident.attachments.map(async (attachment) => {
                 return await getS3Url(attachment);
-              })
+              }),
             );
-            console.log("urls...", urls);
+            console.log('urls...', urls);
 
             setFilePreviews(urls);
           }
         } catch (error) {
-          console.error("Error fetching staff data:", error);
+          console.error('Error fetching staff data:', error);
         }
       };
       fetchTheIncidents();
@@ -122,13 +124,13 @@ const AddIncident = () => {
 
   const validate = () => {
     const errors = {};
-    if (!title) errors.name = "title is required";
-    if (!desc) errors.desc = "Descriptionis required";
-    if (!dateTime) errors.datetime = "Date and Time is required";
+    if (!title) errors.name = 'title is required';
+    if (!desc) errors.desc = 'Descriptionis required';
+    if (!dateTime) errors.datetime = 'Date and Time is required';
 
-    if (!location) errors.address = "Address is required";
+    if (!location) errors.address = 'Address is required';
     if (files.length > 10) {
-      errors.fileUpload = "You can only upload up to 10 images.";
+      errors.fileUpload = 'You can only upload up to 10 images.';
     }
     return errors;
   };
@@ -143,7 +145,7 @@ const AddIncident = () => {
     const incidentInput = {
       title: title, // Assuming `title` is a variable holding the title value
       description: desc, // Assuming `desc` is a variable holding the description value
-      address: add, // Assuming `address` is a variable holding the address value
+      address: location, // Assuming `address` is a variable holding the address value
       staffid: staffid,
       dateTime: dateTime,
       //attachments: attachments, // Assuming `attachments` is an array holding file attachments
@@ -151,13 +153,16 @@ const AddIncident = () => {
       status: status, // Assuming `status` is a variable holding the status of the incident
       //comments: comments // Assuming `comments` is a variable holding any additional comments
     };
+    console.log('incidentInput..', incidentInput);
 
     const incidentResponse = await API.graphql({
       query: mutation.updateTheIncidents,
       variables: { input: { id, ...incidentInput } },
     });
     const createdItem = incidentResponse.data.updateTheIncidents;
-    navigation("/incidenetsList");
+    console.log(createdItem);
+
+   navigation("/incidenetsList");
 
     // try {
     //   const uploadedFiles = await Promise.all(
@@ -186,16 +191,6 @@ const AddIncident = () => {
     // navigation("/dashboard");
   };
   /// file  upload-------------------
-  const handleFileChange = (event) => {
-    const selectedFiles = Array.from(event.target.files);
-
-    setFiles(selectedFiles);
-    setFilePreviewss([...filePreviewss, ...selectedFiles]);
-
-    // Generate file previews
-    const previews = selectedFiles.map((file) => URL.createObjectURL(file));
-    setFilePreviews(previews);
-  };
 
   const onDrop = (acceptedFiles: File[]) => {
     setFilePreviewss([...filePreviewss, ...acceptedFiles]);
@@ -204,11 +199,11 @@ const AddIncident = () => {
   const { getRootProps, getInputProps } = useDropzone({
     onDrop,
     accept:
-      "image/*,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      'image/*,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document',
   });
   const uploadToS3s = async (file, ticketId, fileName) => {
     try {
-      console.log("sds..", file, ticketId, fileName);
+      console.log('sds..', file, ticketId, fileName);
 
       const fullKey = `Incidents/${ticketId}/image/${fileName}`;
 
@@ -216,14 +211,14 @@ const AddIncident = () => {
         key: fullKey,
         data: file,
         options: {
-          accessLevel: "guest", // Change as necessary (guest, private, protected)
+          accessLevel: 'guest', // Change as necessary (guest, private, protected)
         },
       });
 
-      console.log("Uploaded file key:", fullKey); // Log the key for verification
+      console.log('Uploaded file key:', fullKey); // Log the key for verification
       return fullKey; // Return the key to use it in the mutation
     } catch (error) {
-      console.error("Error uploading to S3: ", error);
+      console.error('Error uploading to S3: ', error);
       throw error; // Rethrow the error for handling in the calling function
     }
   };
@@ -234,7 +229,7 @@ const AddIncident = () => {
 
   const handleCancle = () => {
     setIsOpen(false);
-    navigation("/dashboard");
+    navigation('/dashboard');
   };
   return (
     <>
@@ -255,8 +250,8 @@ const AddIncident = () => {
             key="back"
             onClick={handleDialogue}
           >
-            {" "}
-            OK{" "}
+            {' '}
+            OK{' '}
           </button>,
         ]}
       >
@@ -296,165 +291,150 @@ const AddIncident = () => {
                 Incident's information
               </h3>
             </div>
-            <form action="#">
-              <div className="p-6.5 ">
-                <div className="mb-4.5 flex flex-col gap-6 xl:flex-row">
-                  <div className="w-full xl:w-1/2">
-                    <label className="mb-2.5 block text-black dark:text-white">
-                      Staff's Name <span className="text-meta-1">*</span>
-                    </label>
-                    <input
-                      readOnly
-                      value={staffname}
-                      onChange={(e) => setStaffName(e.target.value)} // Update the state with the new value
-                      type="text"
-                      placeholder="Enter your first Name"
-                      className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                    />
-                  </div>
-
-                  <div className="w-full xl:w-1/2">
-                    <label className="mb-2.5 block text-black dark:text-white">
-                      Staff's Email <span className="text-meta-1">*</span>
-                    </label>
-                    <input
-                      readOnly
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      type="text"
-                      placeholder="Enter your  Email"
-                      className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                    />
-                  </div>
-                </div>
-                <div className="mb-4.5  w-full flex flex-col gap-6 xl:flex-row">
-                  <div className="w-full xl:w-1/2">
-                    <label className="mb-2.5 block text-black dark:text-white">
-                      Title <span className="text-meta-1">*</span>
-                    </label>
-                    <input
-                      value={title}
-                      onChange={(e) => setTitle(e.target.value)}
-                      type="Title"
-                      placeholder="Enter your Title"
-                      className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                    />
-                    {errors.name && (
-                      <p className="text-red-500 text-sm mt-1">{errors.name}</p>
-                    )}
-                  </div>
-
-                  <div className="w-full xl:w-1/2">
-                    <label className="mb-2.5 block text-black dark:text-white">
-                      Date & Time
-                      <span className="text-meta-1">*</span>
-                    </label>
-                    <input
-                      value={dateTime}
-                      onChange={(e) => setDate(e.target.value)}
-                      type="text"
-                      placeholder="Enter your    Date & Time"
-                      className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                    />
-                    {errors.datetime && (
-                      <p className="text-red-500 text-sm mt-1">
-                        {errors.datetime}
-                      </p>
-                    )}
-                  </div>
-                </div>
-                <div className="mb-4.5">
+            <div className="p-6.5 ">
+              <div className="mb-4.5 flex flex-col gap-6 xl:flex-row">
+                <div className="w-full xl:w-1/2">
                   <label className="mb-2.5 block text-black dark:text-white">
-                    Location <span className="text-meta-1">*</span>
+                    Staff's Name <span className="text-meta-1">*</span>
                   </label>
                   <input
-                    value={location}
-                    onChange={(e) => setLocation(e.target.value)}
+                    readOnly
+                    value={staffname}
+                    onChange={(e) => setStaffName(e.target.value)} // Update the state with the new value
                     type="text"
-                    placeholder="Enter Location"
+                    placeholder="Enter your first Name"
                     className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
                   />
-                  {errors.address && (
+                </div>
+
+                <div className="w-full xl:w-1/2">
+                  <label className="mb-2.5 block text-black dark:text-white">
+                    Staff's Email <span className="text-meta-1">*</span>
+                  </label>
+                  <input
+                    readOnly
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    type="text"
+                    placeholder="Enter your  Email"
+                    className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                  />
+                </div>
+              </div>
+              <div className="mb-4.5  w-full flex flex-col gap-6 xl:flex-row">
+                <div className="w-full xl:w-1/2">
+                  <label className="mb-2.5 block text-black dark:text-white">
+                    Title <span className="text-meta-1">*</span>
+                  </label>
+                  <input
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    type="Title"
+                    placeholder="Enter your Title"
+                    className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                  />
+                  {errors.name && (
+                    <p className="text-red-500 text-sm mt-1">{errors.name}</p>
+                  )}
+                </div>
+
+                <div className="w-full xl:w-1/2">
+                  <label className="mb-2.5 block text-black dark:text-white">
+                    Date & Time
+                    <span className="text-meta-1">*</span>
+                  </label>
+                  <input
+                    value={dateTime}
+                    onChange={(e) => setDate(e.target.value)}
+                    type="text"
+                    placeholder="Enter your    Date & Time"
+                    className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                  />
+                  {errors.datetime && (
                     <p className="text-red-500 text-sm mt-1">
-                      {errors.address}
+                      {errors.datetime}
                     </p>
                   )}
                 </div>
-                <div className="">
-                  <label className="mb-2.5 block text-black dark:text-white">
-                    Description
-                  </label>
-                  <textarea
-                    rows={3}
-                    value={desc}
-                    onChange={(e) => setDec(e.target.value)}
-                    placeholder="Type your Description"
-                    className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                  ></textarea>
-                </div>
-                <div className="mb-6">
-                  <label className="mb-2.5 block text-black dark:text-white">
-                    Status
-                  </label>
-                  <select
-                    name="frequency"
-                    value={status}
-                    onChange={(e) => setStatus(e.target.value)}
-                    className={`w-full rounded-lg border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary ${errors.frequency ? "border-red-500" : ""} dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary`}
-                  >
-                    <option value="">Select Status</option>
-                    <option value="Pending">Pending</option>
-                    <option value="Approved">Approved</option>
-                  </select>
-                </div>
-               
-
-               
-                <div className="">
-                  {/* <label className="mb-2.5 block text-black dark:text-white">
-                    File Upload (Upload up to 10 images)
-                  </label>
-                  <input
-                    type="file"
-                    multiple
-                    onChange={handleFileChange}
-                    className="w-full rounded border-[1.5px] border-stroke bg-transparent py-2 px-4 text-black outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                  /> */}
-                  {/* {errors.fileUpload && (
-                    <p className="text-red-500 mt-2">{errors.fileUpload}</p>
-                  )} */}
-
-<div className="mt-4 flex flex-wrap gap-4">
-
-<AttachmentPreviews filePreviews={filePreviews} />
-
-  {filePreviews.map((preview, index) => (
-    <img
-      key={index}
-      className="m-3"
-      width={120}
-      height={120}
-      src={preview}
-      alt={`Preview ${index}`}
-    />
-  ))}
-</div>
-                </div>
-                {errors.desc && (
-                  <p className="text-red-500 text-sm mt-1">{errors.desc}</p>
+              </div>
+              <div className="mb-4.5">
+                <label className="mb-2.5 block text-black dark:text-white">
+                  Location <span className="text-meta-1">*</span>
+                </label>
+                <input
+                  value={location}
+                  onChange={(e) => setLocation(e.target.value)}
+                  type="text"
+                  placeholder="Enter Location"
+                  className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                />
+                {errors.address && (
+                  <p className="text-red-500 text-sm mt-1">{errors.address}</p>
                 )}
+              </div>
+              <div className="">
+                <label className="mb-2.5 block text-black dark:text-white">
+                  Description
+                </label>
+                <textarea
+                  rows={3}
+                  value={desc}
+                  onChange={(e) => setDec(e.target.value)}
+                  placeholder="Type your Description"
+                  className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                ></textarea>
+              </div>
+              <div className="mb-6">
+                <label className="mb-2.5 block text-black dark:text-white">
+                  Status
+                </label>
+                <select
+                  name="frequency"
+                  value={status}
+                  onChange={(e) => setStatus(e.target.value)}
+                  className={`w-full rounded-lg border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary ${errors.frequency ? 'border-red-500' : ''} dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary`}
+                >
+                  <option value="">Select Status</option>
+                  <option value="Pending">Pending</option>
+                  <option value="Approved">Approved</option>
+                </select>
+              </div>
 
-                {/* <button className="flex w-full justify-center rounded bg-primary p-3 font-medium text-gray hover:bg-opacity-90">
+              <div className="mt-4 flex flex-wrap gap-4">
+                {filePreviews.length === 0 ? (
+                  <p className="text-center text-black font-bold w-full p-10">
+                    {' '}
+                    No documents uploaded yet.
+                  </p>
+                ) : (
+                  <>
+                    <AttachmentPreviews filePreviews={filePreviews} />
+
+                    {/* {filePreviews.map((preview, index) => (
+        <img
+          key={index}
+          className="m-3"
+          width={120}
+          height={120}
+          src={preview}
+          alt={`Preview ${index}`}
+        />
+      ))} */}
+                  </>
+                )}
+              </div>
+
+              {errors.desc && (
+                <p className="text-red-500 text-sm mt-1">{errors.desc}</p>
+              )}
+
+              {/* <button className="flex w-full justify-center rounded bg-primary p-3 font-medium text-gray hover:bg-opacity-90">
                     Submit
                   </button> */}
-                <button
-                  className="btn-grad w-full pr-20"
-                  onClick={handleSubmit}
-                >
-                  Submit
-                </button>
-              </div>
-            </form>
+              <button className="btn-grad w-full pr-20" onClick={handleSubmit}>
+                Submit
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -464,13 +444,13 @@ const AddIncident = () => {
 
 const renderAttachment = (url) => {
   // Check if the file is an image
-  const isImage = url.match(/\.(jpeg|jpg|gif|png)$/);
-
+  const isImage = url.match(/\.(jpeg|jpg|gif|png|PNG)(\?.*)?$/);
   if (isImage) {
     // Render an image preview
     return (
       <div key={url} className="file-preview">
-        <img src={url} alt="attachment" className="image-preview" />
+        <img className="m-3" width={120} height={120} src={url} />
+        {/* <img src={url} alt="attachment" className="image-preview" /> */}
       </div>
     );
   } else {
@@ -478,7 +458,7 @@ const renderAttachment = (url) => {
     return (
       <div key={url} className="file-preview">
         <a href={url} download className="file-download">
-        <img src={UserOne} alt="User" width={80}height={80} />
+          <img src={UserOne} alt="User" width={80} height={80} />
 
           {/* Replace with a file icon */}
           <span>Download </span>
