@@ -383,7 +383,7 @@ const ClientDetails = () => {
     }
   };
   // Handle form submission
-  const [activeTab, setActiveTab] = useState('ResList'); // State to manage active tab
+  const [activeTab, setActiveTab] = useState('clientpList'); // State to manage active tab
   console.log(filePreviews);
 
   const handleTabClick = (tab) => {
