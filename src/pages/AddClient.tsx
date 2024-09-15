@@ -554,7 +554,7 @@ console.log("clientInputs..",clientInputs);
                       You can add up to 5 people
                     </p>
                     <button
-                      className="ml-auto btn-grad w-[120px]"
+                      className="ml-auto p-2  btn-grad w-[120px]"
                       onClick={handleAddMore}
                     >
                       Add More
