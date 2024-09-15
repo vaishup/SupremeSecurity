@@ -27,9 +27,11 @@ export default function TheNoteUpdateForm(props) {
   const initialValues = {
     note: "",
     clientID: "",
+    staffID: "",
   };
   const [note, setNote] = React.useState(initialValues.note);
   const [clientID, setClientID] = React.useState(initialValues.clientID);
+  const [staffID, setStaffID] = React.useState(initialValues.staffID);
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     const cleanValues = theNoteRecord
@@ -37,6 +39,7 @@ export default function TheNoteUpdateForm(props) {
       : initialValues;
     setNote(cleanValues.note);
     setClientID(cleanValues.clientID);
+    setStaffID(cleanValues.staffID);
     setErrors({});
   };
   const [theNoteRecord, setTheNoteRecord] = React.useState(theNoteModelProp);
@@ -58,6 +61,7 @@ export default function TheNoteUpdateForm(props) {
   const validations = {
     note: [],
     clientID: [],
+    staffID: [],
   };
   const runValidationTasks = async (
     fieldName,
@@ -87,6 +91,7 @@ export default function TheNoteUpdateForm(props) {
         let modelFields = {
           note: note ?? null,
           clientID: clientID ?? null,
+          staffID: staffID ?? null,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -149,6 +154,7 @@ export default function TheNoteUpdateForm(props) {
             const modelFields = {
               note: value,
               clientID,
+              staffID,
             };
             const result = onChange(modelFields);
             value = result?.note ?? value;
@@ -174,6 +180,7 @@ export default function TheNoteUpdateForm(props) {
             const modelFields = {
               note,
               clientID: value,
+              staffID,
             };
             const result = onChange(modelFields);
             value = result?.clientID ?? value;
@@ -187,6 +194,32 @@ export default function TheNoteUpdateForm(props) {
         errorMessage={errors.clientID?.errorMessage}
         hasError={errors.clientID?.hasError}
         {...getOverrideProps(overrides, "clientID")}
+      ></TextField>
+      <TextField
+        label="Staff id"
+        isRequired={false}
+        isReadOnly={false}
+        value={staffID}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              note,
+              clientID,
+              staffID: value,
+            };
+            const result = onChange(modelFields);
+            value = result?.staffID ?? value;
+          }
+          if (errors.staffID?.hasError) {
+            runValidationTasks("staffID", value);
+          }
+          setStaffID(value);
+        }}
+        onBlur={() => runValidationTasks("staffID", staffID)}
+        errorMessage={errors.staffID?.errorMessage}
+        hasError={errors.staffID?.hasError}
+        {...getOverrideProps(overrides, "staffID")}
       ></TextField>
       <Flex
         justifyContent="space-between"

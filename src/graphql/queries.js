@@ -1,12 +1,49 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
+export const getTheClientPerson = /* GraphQL */ `
+  query GetTheClientPerson($id: ID!) {
+    getTheClientPerson(id: $id) {
+      id
+      clientID
+      name
+      phone
+      email
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const listTheClientPeople = /* GraphQL */ `
+  query ListTheClientPeople(
+    $filter: ModelTheClientPersonFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    listTheClientPeople(filter: $filter, limit: $limit, nextToken: $nextToken) {
+      items {
+        id
+        clientID
+        name
+        phone
+        email
+        createdAt
+        updatedAt
+        __typename
+      }
+      nextToken
+      __typename
+    }
+  }
+`;
 export const getTheNote = /* GraphQL */ `
   query GetTheNote($id: ID!) {
     getTheNote(id: $id) {
       id
       note
       clientID
+      staffID
       createdAt
       updatedAt
       __typename
@@ -24,6 +61,7 @@ export const listTheNotes = /* GraphQL */ `
         id
         note
         clientID
+        staffID
         createdAt
         updatedAt
         __typename
@@ -75,6 +113,7 @@ export const getTheResident = /* GraphQL */ `
       phoneNo
       address
       clientID
+      email
       createdAt
       updatedAt
       __typename
@@ -94,6 +133,7 @@ export const listTheResidents = /* GraphQL */ `
         phoneNo
         address
         clientID
+        email
         createdAt
         updatedAt
         __typename
@@ -141,6 +181,7 @@ export const getTheClient = /* GraphQL */ `
       }
       count
       countInt
+      residentType
       createdAt
       updatedAt
       theClientTheIncidentsId
@@ -168,6 +209,7 @@ export const listTheClients = /* GraphQL */ `
         staffids
         count
         countInt
+        residentType
         createdAt
         updatedAt
         theClientTheIncidentsId
@@ -203,6 +245,7 @@ export const getTheStaff = /* GraphQL */ `
         staffids
         count
         countInt
+        residentType
         createdAt
         updatedAt
         theClientTheIncidentsId
@@ -297,6 +340,7 @@ export const getTask = /* GraphQL */ `
         staffids
         count
         countInt
+        residentType
         createdAt
         updatedAt
         theClientTheIncidentsId
@@ -375,6 +419,7 @@ export const getTheIncidents = /* GraphQL */ `
         staffids
         count
         countInt
+        residentType
         createdAt
         updatedAt
         theClientTheIncidentsId
@@ -393,6 +438,7 @@ export const getTheIncidents = /* GraphQL */ `
         staffids
         count
         countInt
+        residentType
         createdAt
         updatedAt
         theClientTheIncidentsId

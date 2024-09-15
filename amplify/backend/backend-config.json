@@ -60,6 +60,11 @@
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
     },
+    "sendReportMail": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
     "test1": {
       "build": true,
       "providerPlugin": "awscloudformation",
@@ -96,6 +101,22 @@
         {
           "category": "function",
           "resourceName": "UpdateStaffIdInClient"
+        }
+      ]
+    },
+    "AMPLIFY_function_sendReportMail_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "sendReportMail"
+        }
+      ]
+    },
+    "AMPLIFY_function_sendReportMail_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "sendReportMail"
         }
       ]
     },

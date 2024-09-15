@@ -14,6 +14,7 @@ import {
   listThePosts,
   listTheResidents,
   listTheNotes,
+  listTheClientPeople,
   theStaffsByTheClientID,
   theStafftheClientsByTheClientId,
 } from '../graphql/queries';
@@ -45,12 +46,15 @@ const ClientDetails = () => {
   const [loading, setLoading] = useState(true); // Add loading state
   const client = generateClient();
   const { id } = useParams();
+
+  const [clientID, setClientID] = useState();
   const [name, setName] = useState();
   const [mobile, setMobile] = useState();
   const [email, setEmail] = useState();
   const [contactPersonPhone, setContactPersonPhone] = useState();
   const [address, setAddress] = useState();
   const [bname, setBname] = useState();
+  const [resident, setResidentType] = useState();
 
   const [filePreviews, setFilePreviews] = useState([]);
   const [IncidentList, setIncidentList] = useState([]);
@@ -59,10 +63,11 @@ const ClientDetails = () => {
   const navigation = useNavigate();
   const [taskList, setTskist] = useState([]);
   const [postList, setPost] = useState([]);
+  const [clientpeople, setClientPeople] = useState([]);
   const [residentList, setResident] = useState([]);
   const [staffList, setStaffList] = useState([]);
   const [noteList, setNoteList] = useState([]);
-  const [count, setCount] = useState("0");
+  const [count, setCount] = useState('0');
 
   const getS3Url = async (key) => {
     try {
@@ -116,13 +121,14 @@ const ClientDetails = () => {
     }
   `;
   useEffect(() => {
+    setClientID(id);
     if (id) {
-     
       fetchclientData(id);
       listTask(id);
       listTheIncidentss(id);
       listResidents(id);
       listPost(id);
+      listPeople(id);
       listNote(id);
     }
   }, [id]);
@@ -136,15 +142,15 @@ const ClientDetails = () => {
       });
       const clientData = clientesponse.data.getTheClient;
       setCount(clientData.count);
-      console.log('clientData.count', clientData.count);
+      setResidentType(
+        clientData.residentType ? clientData.residentType : 'Resident',
+      );
       if (clientData.attachments && Array.isArray(clientData.attachments)) {
         const urls = await Promise.all(
           clientData.attachments.map(async (attachment) => {
             return await getS3Url(attachment);
           }),
         );
-        console.log('urls...', urls);
-
         setFilePreviews(urls);
       }
       setName(clientData.name);
@@ -184,12 +190,12 @@ const ClientDetails = () => {
           },
         },
       });
-      const incidentData = response.data.listTheIncidents;
+      const incidentData = response.data.listTheIncidents.items;
       console.log('incidentData', incidentData);
       const sortedTasks = incidentData.sort(
         (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
       );
-      setIncidentList(sortedTasks.items);
+      setIncidentList(sortedTasks);
     } catch (error) {
       console.error('Error fetching incidentData:', error);
       setLoading(false);
@@ -250,6 +256,34 @@ const ClientDetails = () => {
       setLoading(false);
     }
   };
+  const listPeople = async (id) => {
+    try {
+      const response = await client.graphql({
+        query: listTheClientPeople,
+        variables: {
+          filter: {
+            clientID: {
+              eq: id,
+            },
+          },
+        },
+      });
+      // Access the correct property from the response
+      const clientData = response.data.listTheClientPeople;
+      console.log('clientData', clientData);
+      const sortedTasks = clientData.items.sort(
+        (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
+      );
+      console.log('sortedTasks...', sortedTasks);
+
+      // Set the client data to state
+      setClientPeople(sortedTasks);
+      setLoading(false); // Ensure you're setting the items array to state
+    } catch (error) {
+      console.error('Error fetching listPost', error);
+      setLoading(false);
+    }
+  };
   const listResidents = async (id) => {
     try {
       const response = await client.graphql({
@@ -280,8 +314,24 @@ const ClientDetails = () => {
       setLoading(false);
     }
   };
+  const getTheStaffQuery = /* GraphQL */ `
+    query GetTheStaff($id: ID!) {
+      getTheStaff(id: $id) {
+        id
+        fname
+        phoneno
+        lname
+        email
+        joiningdate
+        address
+        clientIds
+        __typename
+      }
+    }
+  `;
   const listNote = async (id) => {
     try {
+      // Fetch the list of notes for the client
       const response = await client.graphql({
         query: listTheNotes,
         variables: {
@@ -292,23 +342,49 @@ const ClientDetails = () => {
           },
         },
       });
+
       // Access the correct property from the response
       const clientData = response.data.listTheNotes;
-      console.log('listResidents', clientData);
-      const sortedTasks = clientData.items.sort(
+      console.log('clientData...', clientData);
+
+      // Loop through each note and fetch staff data for each
+      const notesWithStaff = await Promise.all(
+        clientData.items.map(async (note) => {
+          // Fetch the staff data for each note
+          const clientDatas = await client.graphql({
+            query: getTheStaffQuery,
+            variables: { id: note.staffID },
+          });
+
+          // Get the staff's fname
+          const staffData = clientDatas.data.getTheStaff;
+          const capitalize = (name) =>
+            name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
+
+          // Attach staff fname to the note
+          return {
+            ...note, // Keep the original note fields
+            staffFname: `${capitalize(staffData.fname)} ${capitalize(staffData.lname)}`, // Capitalized fname and lname
+          };
+        }),
+      );
+
+      // Sort the notes by creation date
+      const sortedTasks = notesWithStaff.sort(
         (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
       );
-      // Set the client data to state
+
+      // Set the notes with staff fname to state
       setNoteList(sortedTasks);
       setLoading(false); // Ensure you're setting the items array to state
     } catch (error) {
-      console.error('Error fetching listResidents:', error);
+      console.error('Error fetching listTheNotes:', error);
       setLoading(false);
     }
   };
   // Handle form submission
   const [activeTab, setActiveTab] = useState('ResList'); // State to manage active tab
-console.log(filePreviews);
+  console.log(filePreviews);
 
   const handleTabClick = (tab) => {
     setActiveTab(tab);
@@ -320,6 +396,7 @@ console.log(filePreviews);
 
   const [add, setAdd] = useState();
   const [names, setame] = useState();
+  const [emailr, setREmail] = useState();
   const [phone, setPhone] = useState();
   const [note, setNote] = useState();
 
@@ -328,6 +405,7 @@ console.log(filePreviews);
     if (!names) errors.names = 'Name is required';
     if (!phone) errors.phone = 'Phone Number is required';
     if (!add) errors.add = 'Address is required';
+    if (!emailr) errors.emailr = 'Email is required';
 
     return errors;
   };
@@ -363,12 +441,12 @@ console.log(filePreviews);
       };
       setIsOpen(false);
       let staffResponse;
-  
+
       staffResponse = await API.graphql({
         query: mutation.createTheResident,
         variables: { input: residentInput },
       });
-    
+
       // }
       // Step 3: Handle the response and navigation
       const createdItem =
@@ -376,10 +454,10 @@ console.log(filePreviews);
         staffResponse.data.updateTheResident;
       console.log(createdItem.id, 'successfully created/updated');
       //setIsOpen(false);
-      setame('')
-     
-      setAdd('')
-      setPhone('')
+      setame('');
+
+      setAdd('');
+      setPhone('');
       listResidents(id);
     } catch (error) {
       console.error('Error creating or updating staff:', error);
@@ -389,7 +467,7 @@ console.log(filePreviews);
 
   const handleSubmitNote = async (e: React.FormEvent) => {
     e.preventDefault();
-    fetchclientData(id)
+    fetchclientData(id);
     // Step 1: Perform validation
     // if (note == '') {
     //   setErrors('Please Enter Note');
@@ -427,7 +505,6 @@ console.log(filePreviews);
         query: mutation.createThePost,
         variables: { input: noteInput },
       });
-     
 
       listPost(id);
       // Make sure count is treated as a number
@@ -458,10 +535,9 @@ console.log(filePreviews);
         const createdItem = taskResponse.data.updateTheClient;
 
         //if(updateResponce)
-        
-        console.log(createdItem, 'suceesfully created');
-       // setIsOpenPost(false);
 
+        console.log(createdItem, 'suceesfully created');
+        // setIsOpenPost(false);
       } catch (error) {
         console.error('Error uploading file:', error);
         // Handle the error (e.g., display error message to user)
@@ -533,6 +609,121 @@ console.log(filePreviews);
       [e.target.name]: e.target.value,
     });
   };
+  ///---------task resident post and delete
+
+  const handleDeleteTask = async (id) => {
+    console.log(id);
+
+    try {
+      // Confirm deletion with the user (optional)
+      // const confirmed = window.confirm(
+      //   "Are you sure you want to delete this item?"
+      // );
+      // if (!confirmed) return;
+
+      // Perform the delete mutation
+      await client.graphql({
+        query: mutation.deleteTask, // Replace with your actual mutation
+        variables: { input: { id } },
+      });
+
+      listTask(clientID);
+      console.log(`Item with ID ${id} has been deleted`);
+
+      // Optionally, you can update the state to remove the deleted item from the list
+      // For example, if you have a state called `orders`:
+      // setOrders(orders.filter(order => order.id !== id));
+    } catch (error) {
+      console.error('Error deleting item:', error);
+    }
+  };
+  //deleteTheNote
+  const handleDeleteResident = async (id) => {
+    try {
+      // Confirm deletion with the user (optional)
+      // const confirmed = window.confirm(
+      //   "Are you sure you want to delete this item?"
+      // );
+      // if (!confirmed) return;
+
+      // Perform the delete mutation
+      await client.graphql({
+        query: mutation.deleteTheResident, // Replace with your actual mutation
+        variables: { input: { id } },
+      });
+
+      listResidents(clientID);
+      console.log(`Item with ID ${id} has been deleted`);
+
+      // Optionally, you can update the state to remove the deleted item from the list
+      // For example, if you have a state called `orders`:
+      // setOrders(orders.filter(order => order.id !== id));
+    } catch (error) {
+      console.error('Error deleting item:', error);
+    }
+  };
+  const handleDeletePost = async (id) => {
+    try {
+      // Confirm deletion with the user (optional)
+      // const confirmed = window.confirm(
+      //   "Are you sure you want to delete this item?"
+      // );
+      // if (!confirmed) return;
+
+      // Perform the delete mutation
+      await client.graphql({
+        query: mutation.deleteThePost, // Replace with your actual mutation
+        variables: { input: { id } },
+      });
+
+      listPost(clientID);
+      console.log(`Item with ID ${id} has been deleted`);
+
+      // Optionally, you can update the state to remove the deleted item from the list
+      // For example, if you have a state called `orders`:
+      // setOrders(orders.filter(order => order.id !== id));
+    } catch (error) {
+      console.error('Error deleting item:', error);
+    }
+  };
+
+  const handleDeleteNote = async (id) => {
+    try {
+      // Confirm deletion with the user (optional)
+      // const confirmed = window.confirm(
+      //   "Are you sure you want to delete this item?"
+      // );
+      // if (!confirmed) return;
+
+      // Perform the delete mutation
+      await client.graphql({
+        query: mutation.deleteTheNote, // Replace with your actual mutation
+        variables: { input: { id } },
+      });
+
+      listNote(clientID);
+      console.log(`Item with ID ${id} has been deleted`);
+
+      // Optionally, you can update the state to remove the deleted item from the list
+      // For example, if you have a state called `orders`:
+      // setOrders(orders.filter(order => order.id !== id));
+    } catch (error) {
+      console.error('Error deleting item:', error);
+    }
+  };
+  const [sortOrder, setSortOrder] = useState('desc'); // default is descending
+  const handleSort = (order) => {
+    setSortOrder(order);
+  };
+
+  // Sort the postList based on createdAt date and the current sortOrder
+  const sortedPostList = [...postList].sort((a, b) => {
+    if (sortOrder === 'asc') {
+      return new Date(a.createdAt) - new Date(b.createdAt);
+    } else {
+      return new Date(b.createdAt) - new Date(a.createdAt);
+    }
+  });
   return (
     <>
       <Breadcrumb pageName={'Client Details'} />
@@ -578,7 +769,7 @@ console.log(filePreviews);
                 <div className="flex  pl-10 pr-10 bg-gray-100">
                   <div className="bg-white w-full max-w-xl">
                     <h3 className="font-medium text-black dark:text-white border-b border-stroke dark:border-gray-700 pb-2">
-                      Resident's Details
+                      {resident}'s Details
                     </h3>
                     <form onClick={handleSubmit} className="w-full">
                       <div className="flex flex-col  xl:flex-row">
@@ -591,7 +782,7 @@ console.log(filePreviews);
                             onChange={(e) => setame(e.target.value)}
                             type="text"
                             name="firstName"
-                            placeholder="Enter your first name"
+                            placeholder="Enter Name"
                             className={`w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary ${errors.firstName ? 'border-red-500' : ''} dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary`}
                           />
                         </div>
@@ -600,6 +791,23 @@ console.log(filePreviews);
                         <p className="text-red-500 text-sm mt-1">
                           {errors.names}
                         </p>
+                      )}
+
+                      <div className="w-full mt-4 ">
+                        <label className="block text-black dark:text-white">
+                          Email<span className="text-meta-1">*</span>
+                        </label>
+                        <input
+                          value={emailr}
+                          onChange={(e) => setREmail(e.target.value)}
+                          type="text"
+                          name="Email"
+                          placeholder="Enter Email"
+                          className={`w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary ${errors.firstName ? 'border-red-500' : ''} dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary`}
+                        />
+                      </div>
+                      {errors.emailr && (
+                        <p className="text-red-500 text-sm ">{errors.emailr}</p>
                       )}
                       <div className="mt-3 w-full flex flex-col xl:flex-row">
                         <div className="w-full ">
@@ -611,7 +819,7 @@ console.log(filePreviews);
                             onChange={(e) => setAdd(e.target.value)}
                             type="address"
                             name="address"
-                            placeholder="Enter your  address"
+                            placeholder="Enter address"
                             className={`w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary ${errors.email ? 'border-red-500' : ''} dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary`}
                           />
                         </div>
@@ -629,7 +837,7 @@ console.log(filePreviews);
                             onChange={(e) => setPhone(e.target.value)}
                             type="phoneNumber"
                             name="phoneNumber"
-                            placeholder="Enter your phone number"
+                            placeholder="Enter phone number"
                             className={`w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary ${errors.phoneNumber ? 'border-red-500' : ''} dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary`}
                           />
                         </div>
@@ -831,8 +1039,6 @@ console.log(filePreviews);
           </div>
 
           <div className="mt-3">
-            <p className="text-blue-800">{name}</p>
-
             <div className="tab-container">
               <div className="tab-content">
                 <div className="info-row">
@@ -850,7 +1056,7 @@ console.log(filePreviews);
 
                     <strong className="text-black  ml-2">{email}</strong>
                   </div>
-                </div>  
+                </div>
                 <div className="info-row">
                   {/* <div className="info-column">
                     <p>Contact Person Phone</p>
@@ -877,6 +1083,7 @@ console.log(filePreviews);
 
             {/* sdsd */}
           </div>
+      
         </div>
 
         <div className="justify-end items-end ml-10 bg-white shadow-lg rounded-sm border border-stroke w-full">
@@ -890,7 +1097,7 @@ console.log(filePreviews);
                 onClick={() => setIsOpen(true)}
                 className="h-10 pl-3 pr-3 bg-primary text-white rounded-full"
               >
-                Add Resident
+                Add {resident}
               </button>
 
               <button
@@ -910,6 +1117,20 @@ console.log(filePreviews);
           </div>
           <div className="w-full">
             <div className="max-h-60 overflow-x-auto  w-full">
+            <div className="flex justify-end space-x-2 mb-4">
+        {/* <button
+          onClick={() => handleSort('asc')}
+          className={`px-4 py-2 rounded ${sortOrder === 'asc' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+        >
+          Sort by Date
+        </button>
+        <button
+          onClick={() => handleSort('desc')}
+          className={`px-4 py-2 rounded ${sortOrder === 'desc' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+        >
+          Date Desc
+        </button> */}
+      </div>
               {postList.length > 0 ? (
                 <table className="mt-4 p-3 min-w-full bg-white rounded-lg shadow w-full">
                   <tbody className="w-full">
@@ -924,14 +1145,23 @@ console.log(filePreviews);
                         <td className="px-6 py-4 border-b border-gray-200 bg-white text-sm w-1/2 text-right">
                           {formatDate(order.createdAt)}
                         </td>
+                        <td className="px-6 py-4 border-b border-gray-200 bg-white text-sm w-1/2 text-right">
+                          <Trash2
+                            onClick={() => handleDeletePost(order.id)}
+                            className="inline-block transition duration-300 ease-in-out transform  hover:text-black hover:scale-110"
+                            color="red"
+                            size={20}
+                          />
+                        </td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
               ) : (
                 <div className="text-center py-10 text-gray-500">
-                           <p className="text-center text-black font-bold w-full p-10">No data found</p>
-
+                  <p className="text-center text-black font-bold w-full p-10">
+                    No data found
+                  </p>
                 </div>
               )}
             </div>
@@ -945,6 +1175,16 @@ console.log(filePreviews);
             {/* Tab Navigation */}
             <div className="border-b p-3 flex pl-3">
               <button
+                onClick={() => handleTabClick('clientpList')}
+                className={`w-full px-4 py-2 uppercase text-black  p-3 font-bold border-b-2 rounded-lg shadow-sm transition duration-300 ${
+                  activeTab === 'clientpList'
+                    ? 'bg-[#7a2828] text-white border-[#7a2828]'
+                    : 'bg-white text-black border-transparent hover:bg-gray-200'
+                }`}
+              >
+                Client's People List
+              </button>
+              <button
                 onClick={() => handleTabClick('ResList')}
                 className={`w-full px-4 py-2 uppercase text-black  p-3 font-bold border-b-2 rounded-lg shadow-sm transition duration-300 ${
                   activeTab === 'ResList'
@@ -952,7 +1192,7 @@ console.log(filePreviews);
                     : 'bg-white text-black border-transparent hover:bg-gray-200'
                 }`}
               >
-                Resident List
+                {resident} List
               </button>
               <button
                 onClick={() => handleTabClick('TaskList')}
@@ -988,6 +1228,68 @@ console.log(filePreviews);
             {/* <div className=' mt-3'></div> */}
             {/* Tab Content */}
             <div className="max-h-100 overflow-x-auto mt-2">
+              {activeTab === 'clientpList' &&
+                (clientpeople.length > 0 ? (
+                  <table className="min-w-full bg-white shadow overflow-hidden">
+                    <thead className="bg-gray-100">
+                      <tr>
+                        <th className="px-6 py-3 border-gray-200 text-black text-left text-sm uppercase font-bold">
+                          Name
+                        </th>
+
+                        <th className="px-6 py-3  border-gray-200 text-black text-left text-sm uppercase font-bold">
+                          Email
+                        </th>
+                        <th className="px-6 py-3 border-gray-200 text-black text-left text-sm uppercase font-bold">
+                          Phone No
+                        </th>
+                        <th className="px-6 py-3 border-gray-200 text-black text-left text-sm uppercase font-bold">
+                          Created Date
+                        </th>
+                        <th className="px-6 py-3 border-gray-200 text-black text-left text-sm uppercase font-bold">
+                          ACTION
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {clientpeople.map((order, index) => (
+                        <tr
+                          key={order.id}
+                          className={
+                            index % 2 === 0 ? 'bg-[#f2f2f2]' : 'bg-white'
+                          }
+                        >
+                          <td className="px-6 py-4  border-gray-200  text-sm">
+                            {order.name}
+                          </td>
+                          <td className="px-6 py-4 border-gray-200  text-sm">
+                            {order.phone}
+                          </td>
+                          <td className="px-6 py-4  border-gray-200  text-sm">
+                            {order.email}
+                          </td>
+                          <td className="px-6 py-4  border-gray-200  text-sm">
+                            {formatDate(order.createdAt)}
+                          </td>
+                          <td className="px-6 py-4  border-gray-200 text-sm">
+                            <Trash2
+                              onClick={() => handleDeleteResident(order.id)}
+                              className="inline-block transition duration-300 ease-in-out transform  hover:text-black hover:scale-110"
+                              color="red"
+                              size={20}
+                            />
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                ) : (
+                  <div className="text-center text-gray-500 py-10">
+                    <p className="text-center text-black font-bold w-full p-10">
+                      No data found
+                    </p>
+                  </div>
+                ))}
               {activeTab === 'ResList' &&
                 (residentList.length > 0 ? (
                   <table className="min-w-full bg-white shadow overflow-hidden">
@@ -1005,6 +1307,9 @@ console.log(filePreviews);
                         </th>
                         <th className="px-6 py-3 border-gray-200 text-black text-left text-sm uppercase font-bold">
                           Created Date
+                        </th>
+                        <th className="px-6 py-3 border-gray-200 text-black text-left text-sm uppercase font-bold">
+                          ACTION
                         </th>
                       </tr>
                     </thead>
@@ -1028,14 +1333,23 @@ console.log(filePreviews);
                           <td className="px-6 py-4  border-gray-200  text-sm">
                             {formatDate(order.createdAt)}
                           </td>
+                          <td className="px-6 py-4  border-gray-200 text-sm">
+                            <Trash2
+                              onClick={() => handleDeleteResident(order.id)}
+                              className="inline-block transition duration-300 ease-in-out transform  hover:text-black hover:scale-110"
+                              color="red"
+                              size={20}
+                            />
+                          </td>
                         </tr>
                       ))}
                     </tbody>
                   </table>
                 ) : (
                   <div className="text-center text-gray-500 py-10">
-                                 <p className="text-center text-black font-bold w-full p-10">No data found</p>
-
+                    <p className="text-center text-black font-bold w-full p-10">
+                      No data found
+                    </p>
                   </div>
                 ))}
               {activeTab === 'TaskList' &&
@@ -1054,6 +1368,9 @@ console.log(filePreviews);
                         </th>
                         <th className="px-6 py-3 border-gray-200 text-black text-left text-sm uppercase font-bold">
                           Frequency
+                        </th>
+                        <th className="px-6 py-3 border-gray-200 text-black text-left text-sm uppercase font-bold">
+                          ACTION
                         </th>
                       </tr>
                     </thead>
@@ -1077,14 +1394,23 @@ console.log(filePreviews);
                           <td className="px-6 py-4  border-gray-200 text-sm">
                             {order.frequency}
                           </td>
+                          <td className="px-6 py-4  border-gray-200 text-sm">
+                            <Trash2
+                              onClick={() => handleDeleteTask(order.id)}
+                              className="inline-block transition duration-300 ease-in-out transform  hover:text-black hover:scale-110"
+                              color="red"
+                              size={20}
+                            />
+                          </td>
                         </tr>
                       ))}
                     </tbody>
                   </table>
                 ) : (
                   <div className="text-center text-gray-500 py-10">
-                                 <p className="text-center text-black font-bold w-full p-10">No data found</p>
-
+                    <p className="text-center text-black font-bold w-full p-10">
+                      No data found
+                    </p>
                   </div>
                 ))}
 
@@ -1134,8 +1460,9 @@ console.log(filePreviews);
                   </table>
                 ) : (
                   <div className="text-center text-gray-500 py-10">
-                        <p className="text-center text-black font-bold w-full p-10">No data found</p>
-
+                    <p className="text-center text-black font-bold w-full p-10">
+                      No data found
+                    </p>
                   </div>
                 ))}
 
@@ -1191,8 +1518,9 @@ console.log(filePreviews);
                     </table>
                   ) : (
                     <div className="text-center py-10 text-gray-500">
-                                  <p className="text-center text-black font-bold w-full p-10">No data found</p>
-
+                      <p className="text-center text-black font-bold w-full p-10">
+                        No data found
+                      </p>
                     </div>
                   )}
                 </div>
@@ -1207,14 +1535,16 @@ console.log(filePreviews);
             Client's Documents
           </h4>
           <div className="mt-4 flex flex-wrap gap-4">
-  {filePreviews.length === 0 ? (
-    <p className="text-center text-black font-bold w-full p-10">      No documents uploaded yet. 
-    </p>
-    ) : (
-    <>
-      <AttachmentPreviews filePreviews={filePreviews} />
+            {filePreviews.length === 0 ? (
+              <p className="text-center text-black font-bold w-full p-10">
+                {' '}
+                No documents uploaded yet.
+              </p>
+            ) : (
+              <>
+                <AttachmentPreviews filePreviews={filePreviews} />
 
-      {/* {filePreviews.map((preview, index) => (
+                {/* {filePreviews.map((preview, index) => (
         <img
           key={index}
           className="m-3"
@@ -1224,32 +1554,38 @@ console.log(filePreviews);
           alt={`Preview ${index}`}
         />
       ))} */}
-    </>
-  )}
-</div>
-
+              </>
+            )}
+          </div>
         </div>
       </div>
 
-      <div className="mt-10 w-1/2 h-full bg-white shadow-lg rounded-sm border border-stroke dark:border-strokedark dark:bg-boxdark">
+      <div className="mt-10 w-[560px] h-full bg-white shadow-lg rounded-sm border border-stroke dark:border-strokedark dark:bg-boxdark">
         <div className="flex flex-col">
           <h4 className="border-b  border-stroke p-4 font-medium text-xl text-black dark:text-white">
             Staff's Notes
           </h4>
-          {noteList.length > 0 ? (
-            <table className="min-w-full bg-white shadow overflow-hidden">
-              <thead className="bg-gray-100">
-                <tr>
-                  <th className="px-6 py-3 border-gray-200 text-black text-left text-sm uppercase font-bold">
-                    Notes
-                  </th>
-                  <th className="text-right px-6 py-3 border-gray-200 text-black text-left text-sm uppercase font-bold">
-                    Created Date
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {noteList.map((order, index) => (
+          <table className="min-w-full bg-white shadow overflow-hidden">
+            <thead className="bg-gray-100">
+              <tr>
+                <th className="px-6 py-3 border-gray-200 text-black text-left text-sm uppercase font-bold">
+                  Note
+                </th>
+                <th className=" border-gray-200 text-black text-center text-sm uppercase font-bold">
+                  Staff Name
+                </th>
+
+                <th className="text-right px-6 py-3 border-gray-200 text-black text-center text-sm uppercase font-bold">
+                  Created Date
+                </th>
+                <th className="text-right px-6 py-3 border-gray-200 text-black text-left text-sm uppercase font-bold">
+                  Action
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {noteList.length > 0 ? (
+                noteList.map((order, index) => (
                   <tr
                     key={order.id}
                     className={index % 2 === 0 ? 'bg-[#f2f2f2]' : 'bg-white'}
@@ -1257,19 +1593,30 @@ console.log(filePreviews);
                     <td className="px-6 py-4 border-gray-200 text-sm">
                       {order.note}
                     </td>
-                    <td className="px-6 py-4 text-right border-gray-200 text-sm">
+
+                    <td className="px-6 py-4 border-gray-200 text-center text-sm">
+                      {order.staffFname}
+                    </td>
+                    <td className="px-6 py-4 text-center border-gray-200 text-sm">
                       {formatDate(order.createdAt)}
                     </td>
+                    <td className="px-6 py-4  border-gray-200 text-sm text-center">
+                      <Trash2
+                        onClick={() => handleDeleteNote(order.id)}
+                        className="inline-block transition duration-300 ease-in-out transform  hover:text-black hover:scale-110"
+                        color="red"
+                        size={20}
+                      />
+                    </td>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          ) : (
-            <div className="text-center text-gray-500 py-10">
-               <p className="text-center text-black font-bold w-full p-10">No data found</p>
-               
-               </div>
-          )}
+                ))
+              ) : (
+                <p className="text-center text-black font-bold w-full p-10">
+                  No data found
+                </p>
+              )}
+            </tbody>
+          </table>
         </div>
       </div>
     </>
@@ -1278,23 +1625,17 @@ console.log(filePreviews);
 const renderAttachment = (url) => {
   // Check if the file is an image
   console.log(url);
-  
+
   const isImage = url.match(/\.(jpeg|jpg|gif|png|PNG)(\?.*)?$/);
-  console.log("isImage",isImage);
+  console.log('isImage', isImage);
 
   if (isImage) {
-console.log("isImage",isImage);
+    console.log('isImage', isImage);
 
     // Render an image preview
     return (
       <div key={url} className="file-preview">
-
-<img
-          className="m-3"
-          width={120}
-          height={120}
-          src={url}
-        />
+        <img className="m-3" width={120} height={120} src={url} />
         {/* <img src={url} alt="attachment" className="image-preview" /> */}
       </div>
     );

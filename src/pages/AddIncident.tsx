@@ -33,7 +33,6 @@ const AddIncident = () => {
   const [desc, setDec] = useState();
   const [dateTime, setTime] = useState();
   const [status, setStatus] = useState();
-  const [file, setFile] = useState([]);
   const [files, setFiles] = useState([]);
   const { id, add } = useParams();
   const [filePreviewss, setFilePreviewss] = useState<File[]>([]);
@@ -91,7 +90,6 @@ const AddIncident = () => {
 
           const getTheStaffs = clientData.data.getTheStaff;
           console.log('getTheStaff', getTheStaffs);
-
           setStaffName(getTheStaffs.fname + getTheStaffs.lname);
           setEmail(getTheStaffs.email);
           setStaffId(getTheStaffs.id);
@@ -104,7 +102,6 @@ const AddIncident = () => {
               }),
             );
             console.log('urls...', urls);
-
             setFilePreviews(urls);
           }
         } catch (error) {
@@ -153,15 +150,12 @@ const AddIncident = () => {
       status: status, // Assuming `status` is a variable holding the status of the incident
       //comments: comments // Assuming `comments` is a variable holding any additional comments
     };
-    console.log('incidentInput..', incidentInput);
-
     const incidentResponse = await API.graphql({
       query: mutation.updateTheIncidents,
       variables: { input: { id, ...incidentInput } },
     });
     const createdItem = incidentResponse.data.updateTheIncidents;
     console.log(createdItem);
-
    navigation("/incidenetsList");
 
     // try {
@@ -431,7 +425,7 @@ const AddIncident = () => {
               {/* <button className="flex w-full justify-center rounded bg-primary p-3 font-medium text-gray hover:bg-opacity-90">
                     Submit
                   </button> */}
-              <button className="btn-grad w-full pr-20" onClick={handleSubmit}>
+              <button className="btn-grad w-full p-3" onClick={handleSubmit}>
                 Submit
               </button>
             </div>

@@ -29,11 +29,13 @@ export default function TheResidentUpdateForm(props) {
     phoneNo: "",
     address: "",
     clientID: "",
+    email: "",
   };
   const [Name, setName] = React.useState(initialValues.Name);
   const [phoneNo, setPhoneNo] = React.useState(initialValues.phoneNo);
   const [address, setAddress] = React.useState(initialValues.address);
   const [clientID, setClientID] = React.useState(initialValues.clientID);
+  const [email, setEmail] = React.useState(initialValues.email);
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     const cleanValues = theResidentRecord
@@ -43,6 +45,7 @@ export default function TheResidentUpdateForm(props) {
     setPhoneNo(cleanValues.phoneNo);
     setAddress(cleanValues.address);
     setClientID(cleanValues.clientID);
+    setEmail(cleanValues.email);
     setErrors({});
   };
   const [theResidentRecord, setTheResidentRecord] =
@@ -67,6 +70,7 @@ export default function TheResidentUpdateForm(props) {
     phoneNo: [],
     address: [],
     clientID: [],
+    email: [],
   };
   const runValidationTasks = async (
     fieldName,
@@ -98,6 +102,7 @@ export default function TheResidentUpdateForm(props) {
           phoneNo: phoneNo ?? null,
           address: address ?? null,
           clientID: clientID ?? null,
+          email: email ?? null,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -162,6 +167,7 @@ export default function TheResidentUpdateForm(props) {
               phoneNo,
               address,
               clientID,
+              email,
             };
             const result = onChange(modelFields);
             value = result?.Name ?? value;
@@ -189,6 +195,7 @@ export default function TheResidentUpdateForm(props) {
               phoneNo: value,
               address,
               clientID,
+              email,
             };
             const result = onChange(modelFields);
             value = result?.phoneNo ?? value;
@@ -216,6 +223,7 @@ export default function TheResidentUpdateForm(props) {
               phoneNo,
               address: value,
               clientID,
+              email,
             };
             const result = onChange(modelFields);
             value = result?.address ?? value;
@@ -243,6 +251,7 @@ export default function TheResidentUpdateForm(props) {
               phoneNo,
               address,
               clientID: value,
+              email,
             };
             const result = onChange(modelFields);
             value = result?.clientID ?? value;
@@ -256,6 +265,34 @@ export default function TheResidentUpdateForm(props) {
         errorMessage={errors.clientID?.errorMessage}
         hasError={errors.clientID?.hasError}
         {...getOverrideProps(overrides, "clientID")}
+      ></TextField>
+      <TextField
+        label="Email"
+        isRequired={false}
+        isReadOnly={false}
+        value={email}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              Name,
+              phoneNo,
+              address,
+              clientID,
+              email: value,
+            };
+            const result = onChange(modelFields);
+            value = result?.email ?? value;
+          }
+          if (errors.email?.hasError) {
+            runValidationTasks("email", value);
+          }
+          setEmail(value);
+        }}
+        onBlur={() => runValidationTasks("email", email)}
+        errorMessage={errors.email?.errorMessage}
+        hasError={errors.email?.hasError}
+        {...getOverrideProps(overrides, "email")}
       ></TextField>
       <Flex
         justifyContent="space-between"

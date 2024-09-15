@@ -1,6 +1,57 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
+export const createTheClientPerson = /* GraphQL */ `
+  mutation CreateTheClientPerson(
+    $input: CreateTheClientPersonInput!
+    $condition: ModelTheClientPersonConditionInput
+  ) {
+    createTheClientPerson(input: $input, condition: $condition) {
+      id
+      clientID
+      name
+      phone
+      email
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const updateTheClientPerson = /* GraphQL */ `
+  mutation UpdateTheClientPerson(
+    $input: UpdateTheClientPersonInput!
+    $condition: ModelTheClientPersonConditionInput
+  ) {
+    updateTheClientPerson(input: $input, condition: $condition) {
+      id
+      clientID
+      name
+      phone
+      email
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const deleteTheClientPerson = /* GraphQL */ `
+  mutation DeleteTheClientPerson(
+    $input: DeleteTheClientPersonInput!
+    $condition: ModelTheClientPersonConditionInput
+  ) {
+    deleteTheClientPerson(input: $input, condition: $condition) {
+      id
+      clientID
+      name
+      phone
+      email
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
 export const createTheNote = /* GraphQL */ `
   mutation CreateTheNote(
     $input: CreateTheNoteInput!
@@ -10,6 +61,7 @@ export const createTheNote = /* GraphQL */ `
       id
       note
       clientID
+      staffID
       createdAt
       updatedAt
       __typename
@@ -25,6 +77,7 @@ export const updateTheNote = /* GraphQL */ `
       id
       note
       clientID
+      staffID
       createdAt
       updatedAt
       __typename
@@ -40,6 +93,7 @@ export const deleteTheNote = /* GraphQL */ `
       id
       note
       clientID
+      staffID
       createdAt
       updatedAt
       __typename
@@ -105,6 +159,7 @@ export const createTheResident = /* GraphQL */ `
       phoneNo
       address
       clientID
+      email
       createdAt
       updatedAt
       __typename
@@ -122,6 +177,7 @@ export const updateTheResident = /* GraphQL */ `
       phoneNo
       address
       clientID
+      email
       createdAt
       updatedAt
       __typename
@@ -139,6 +195,7 @@ export const deleteTheResident = /* GraphQL */ `
       phoneNo
       address
       clientID
+      email
       createdAt
       updatedAt
       __typename
@@ -186,6 +243,7 @@ export const createTheClient = /* GraphQL */ `
       }
       count
       countInt
+      residentType
       createdAt
       updatedAt
       theClientTheIncidentsId
@@ -234,6 +292,7 @@ export const updateTheClient = /* GraphQL */ `
       }
       count
       countInt
+      residentType
       createdAt
       updatedAt
       theClientTheIncidentsId
@@ -282,6 +341,7 @@ export const deleteTheClient = /* GraphQL */ `
       }
       count
       countInt
+      residentType
       createdAt
       updatedAt
       theClientTheIncidentsId
@@ -317,6 +377,7 @@ export const createTheStaff = /* GraphQL */ `
         staffids
         count
         countInt
+        residentType
         createdAt
         updatedAt
         theClientTheIncidentsId
@@ -357,6 +418,7 @@ export const updateTheStaff = /* GraphQL */ `
         staffids
         count
         countInt
+        residentType
         createdAt
         updatedAt
         theClientTheIncidentsId
@@ -397,6 +459,7 @@ export const deleteTheStaff = /* GraphQL */ `
         staffids
         count
         countInt
+        residentType
         createdAt
         updatedAt
         theClientTheIncidentsId
@@ -432,6 +495,7 @@ export const createTask = /* GraphQL */ `
         staffids
         count
         countInt
+        residentType
         createdAt
         updatedAt
         theClientTheIncidentsId
@@ -468,6 +532,7 @@ export const updateTask = /* GraphQL */ `
         staffids
         count
         countInt
+        residentType
         createdAt
         updatedAt
         theClientTheIncidentsId
@@ -504,6 +569,7 @@ export const deleteTask = /* GraphQL */ `
         staffids
         count
         countInt
+        residentType
         createdAt
         updatedAt
         theClientTheIncidentsId
@@ -562,6 +628,7 @@ export const createTheIncidents = /* GraphQL */ `
         staffids
         count
         countInt
+        residentType
         createdAt
         updatedAt
         theClientTheIncidentsId
@@ -580,6 +647,7 @@ export const createTheIncidents = /* GraphQL */ `
         staffids
         count
         countInt
+        residentType
         createdAt
         updatedAt
         theClientTheIncidentsId
@@ -639,6 +707,7 @@ export const updateTheIncidents = /* GraphQL */ `
         staffids
         count
         countInt
+        residentType
         createdAt
         updatedAt
         theClientTheIncidentsId
@@ -657,6 +726,7 @@ export const updateTheIncidents = /* GraphQL */ `
         staffids
         count
         countInt
+        residentType
         createdAt
         updatedAt
         theClientTheIncidentsId
@@ -716,6 +786,7 @@ export const deleteTheIncidents = /* GraphQL */ `
         staffids
         count
         countInt
+        residentType
         createdAt
         updatedAt
         theClientTheIncidentsId
@@ -734,6 +805,7 @@ export const deleteTheIncidents = /* GraphQL */ `
         staffids
         count
         countInt
+        residentType
         createdAt
         updatedAt
         theClientTheIncidentsId

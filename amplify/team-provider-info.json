@@ -27,6 +27,10 @@
         "test1": {
           "deploymentBucketName": "amplify-supremesecurity-dev-2ffdf-deployment",
           "s3Key": "amplify-builds/test1-374554314e6a6c5a3377-build.zip"
+        },
+        "sendReportMail": {
+          "deploymentBucketName": "amplify-supremesecurity-dev-2ffdf-deployment",
+          "s3Key": "amplify-builds/sendReportMail-6974322f797639336257-build.zip"
         }
       },
       "api": {

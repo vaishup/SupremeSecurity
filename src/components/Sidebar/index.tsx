@@ -304,7 +304,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                             ></path>{' '}
                           </g>
                         </svg> */}
-                        Tasks
+                        Protocols
                       </NavLink>
 
                       {/* <!-- Dropdown Menu Start --> */}

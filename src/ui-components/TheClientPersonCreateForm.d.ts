@@ -21,37 +21,34 @@ export declare type ValidationResponse = {
     errorMessage?: string;
 };
 export declare type ValidationFunction<T> = (value: T, validationResponse: ValidationResponse) => ValidationResponse | Promise<ValidationResponse>;
-export declare type TheResidentCreateFormInputValues = {
-    Name?: string;
-    phoneNo?: string;
-    address?: string;
+export declare type TheClientPersonCreateFormInputValues = {
     clientID?: string;
+    name?: string;
+    phone?: string;
     email?: string;
 };
-export declare type TheResidentCreateFormValidationValues = {
-    Name?: ValidationFunction<string>;
-    phoneNo?: ValidationFunction<string>;
-    address?: ValidationFunction<string>;
+export declare type TheClientPersonCreateFormValidationValues = {
     clientID?: ValidationFunction<string>;
+    name?: ValidationFunction<string>;
+    phone?: ValidationFunction<string>;
     email?: ValidationFunction<string>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
-export declare type TheResidentCreateFormOverridesProps = {
-    TheResidentCreateFormGrid?: PrimitiveOverrideProps<GridProps>;
-    Name?: PrimitiveOverrideProps<TextFieldProps>;
-    phoneNo?: PrimitiveOverrideProps<TextFieldProps>;
-    address?: PrimitiveOverrideProps<TextFieldProps>;
+export declare type TheClientPersonCreateFormOverridesProps = {
+    TheClientPersonCreateFormGrid?: PrimitiveOverrideProps<GridProps>;
     clientID?: PrimitiveOverrideProps<TextFieldProps>;
+    name?: PrimitiveOverrideProps<TextFieldProps>;
+    phone?: PrimitiveOverrideProps<TextFieldProps>;
     email?: PrimitiveOverrideProps<TextFieldProps>;
 } & EscapeHatchProps;
-export declare type TheResidentCreateFormProps = React.PropsWithChildren<{
-    overrides?: TheResidentCreateFormOverridesProps | undefined | null;
+export declare type TheClientPersonCreateFormProps = React.PropsWithChildren<{
+    overrides?: TheClientPersonCreateFormOverridesProps | undefined | null;
 } & {
     clearOnSuccess?: boolean;
-    onSubmit?: (fields: TheResidentCreateFormInputValues) => TheResidentCreateFormInputValues;
-    onSuccess?: (fields: TheResidentCreateFormInputValues) => void;
-    onError?: (fields: TheResidentCreateFormInputValues, errorMessage: string) => void;
-    onChange?: (fields: TheResidentCreateFormInputValues) => TheResidentCreateFormInputValues;
-    onValidate?: TheResidentCreateFormValidationValues;
+    onSubmit?: (fields: TheClientPersonCreateFormInputValues) => TheClientPersonCreateFormInputValues;
+    onSuccess?: (fields: TheClientPersonCreateFormInputValues) => void;
+    onError?: (fields: TheClientPersonCreateFormInputValues, errorMessage: string) => void;
+    onChange?: (fields: TheClientPersonCreateFormInputValues) => TheClientPersonCreateFormInputValues;
+    onValidate?: TheClientPersonCreateFormValidationValues;
 } & React.CSSProperties>;
-export default function TheResidentCreateForm(props: TheResidentCreateFormProps): React.ReactElement;
+export default function TheClientPersonCreateForm(props: TheClientPersonCreateFormProps): React.ReactElement;

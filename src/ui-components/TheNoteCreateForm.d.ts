@@ -24,16 +24,19 @@ export declare type ValidationFunction<T> = (value: T, validationResponse: Valid
 export declare type TheNoteCreateFormInputValues = {
     note?: string;
     clientID?: string;
+    staffID?: string;
 };
 export declare type TheNoteCreateFormValidationValues = {
     note?: ValidationFunction<string>;
     clientID?: ValidationFunction<string>;
+    staffID?: ValidationFunction<string>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
 export declare type TheNoteCreateFormOverridesProps = {
     TheNoteCreateFormGrid?: PrimitiveOverrideProps<GridProps>;
     note?: PrimitiveOverrideProps<TextFieldProps>;
     clientID?: PrimitiveOverrideProps<TextFieldProps>;
+    staffID?: PrimitiveOverrideProps<TextFieldProps>;
 } & EscapeHatchProps;
 export declare type TheNoteCreateFormProps = React.PropsWithChildren<{
     overrides?: TheNoteCreateFormOverridesProps | undefined | null;

@@ -1,7 +1,16 @@
+type TheClientPerson @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  clientID: String
+  name: String
+  phone: String
+  email: String
+}
+
 type TheNote @model @auth(rules: [{allow: public}]) {
   id: ID!
   note: String
   clientID: String
+  staffID: String
 }
 
 type ThePost @model @auth(rules: [{allow: public}]) {
@@ -17,6 +26,7 @@ type TheResident @model @auth(rules: [{allow: public}]) {
   phoneNo: String
   address: String
   clientID: String
+  email: String
 }
 
 type theClient @model @auth(rules: [{allow: public}]) {
@@ -34,6 +44,7 @@ type theClient @model @auth(rules: [{allow: public}]) {
   theIncidents: theIncidents @belongsTo
   count: String
   countInt: Int
+  residentType: String
 }
 
 type theStaff @model @auth(rules: [{allow: public}]) {

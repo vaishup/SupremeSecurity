@@ -9,11 +9,13 @@ import * as React from "react";
 import { Button, Flex, Grid, TextField } from "@aws-amplify/ui-react";
 import { fetchByPath, getOverrideProps, validateField } from "./utils";
 import { generateClient } from "aws-amplify/api";
-import { createTheNote } from "../graphql/mutations";
+import { getTheClientPerson } from "../graphql/queries";
+import { updateTheClientPerson } from "../graphql/mutations";
 const client = generateClient();
-export default function TheNoteCreateForm(props) {
+export default function TheClientPersonUpdateForm(props) {
   const {
-    clearOnSuccess = true,
+    id: idProp,
+    theClientPerson: theClientPersonModelProp,
     onSuccess,
     onError,
     onSubmit,
@@ -23,24 +25,49 @@ export default function TheNoteCreateForm(props) {
     ...rest
   } = props;
   const initialValues = {
-    note: "",
     clientID: "",
-    staffID: "",
+    name: "",
+    phone: "",
+    email: "",
   };
-  const [note, setNote] = React.useState(initialValues.note);
   const [clientID, setClientID] = React.useState(initialValues.clientID);
-  const [staffID, setStaffID] = React.useState(initialValues.staffID);
+  const [name, setName] = React.useState(initialValues.name);
+  const [phone, setPhone] = React.useState(initialValues.phone);
+  const [email, setEmail] = React.useState(initialValues.email);
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
-    setNote(initialValues.note);
-    setClientID(initialValues.clientID);
-    setStaffID(initialValues.staffID);
+    const cleanValues = theClientPersonRecord
+      ? { ...initialValues, ...theClientPersonRecord }
+      : initialValues;
+    setClientID(cleanValues.clientID);
+    setName(cleanValues.name);
+    setPhone(cleanValues.phone);
+    setEmail(cleanValues.email);
     setErrors({});
   };
+  const [theClientPersonRecord, setTheClientPersonRecord] = React.useState(
+    theClientPersonModelProp
+  );
+  React.useEffect(() => {
+    const queryData = async () => {
+      const record = idProp
+        ? (
+            await client.graphql({
+              query: getTheClientPerson.replaceAll("__typename", ""),
+              variables: { id: idProp },
+            })
+          )?.data?.getTheClientPerson
+        : theClientPersonModelProp;
+      setTheClientPersonRecord(record);
+    };
+    queryData();
+  }, [idProp, theClientPersonModelProp]);
+  React.useEffect(resetStateValues, [theClientPersonRecord]);
   const validations = {
-    note: [],
     clientID: [],
-    staffID: [],
+    name: [],
+    phone: [],
+    email: [],
   };
   const runValidationTasks = async (
     fieldName,
@@ -68,9 +95,10 @@ export default function TheNoteCreateForm(props) {
       onSubmit={async (event) => {
         event.preventDefault();
         let modelFields = {
-          note,
-          clientID,
-          staffID,
+          clientID: clientID ?? null,
+          name: name ?? null,
+          phone: phone ?? null,
+          email: email ?? null,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -101,18 +129,16 @@ export default function TheNoteCreateForm(props) {
             }
           });
           await client.graphql({
-            query: createTheNote.replaceAll("__typename", ""),
+            query: updateTheClientPerson.replaceAll("__typename", ""),
             variables: {
               input: {
+                id: theClientPersonRecord.id,
                 ...modelFields,
               },
             },
           });
           if (onSuccess) {
             onSuccess(modelFields);
-          }
-          if (clearOnSuccess) {
-            resetStateValues();
           }
         } catch (err) {
           if (onError) {
@@ -121,35 +147,9 @@ export default function TheNoteCreateForm(props) {
           }
         }
       }}
-      {...getOverrideProps(overrides, "TheNoteCreateForm")}
+      {...getOverrideProps(overrides, "TheClientPersonUpdateForm")}
       {...rest}
     >
-      <TextField
-        label="Note"
-        isRequired={false}
-        isReadOnly={false}
-        value={note}
-        onChange={(e) => {
-          let { value } = e.target;
-          if (onChange) {
-            const modelFields = {
-              note: value,
-              clientID,
-              staffID,
-            };
-            const result = onChange(modelFields);
-            value = result?.note ?? value;
-          }
-          if (errors.note?.hasError) {
-            runValidationTasks("note", value);
-          }
-          setNote(value);
-        }}
-        onBlur={() => runValidationTasks("note", note)}
-        errorMessage={errors.note?.errorMessage}
-        hasError={errors.note?.hasError}
-        {...getOverrideProps(overrides, "note")}
-      ></TextField>
       <TextField
         label="Client id"
         isRequired={false}
@@ -159,9 +159,10 @@ export default function TheNoteCreateForm(props) {
           let { value } = e.target;
           if (onChange) {
             const modelFields = {
-              note,
               clientID: value,
-              staffID,
+              name,
+              phone,
+              email,
             };
             const result = onChange(modelFields);
             value = result?.clientID ?? value;
@@ -177,43 +178,99 @@ export default function TheNoteCreateForm(props) {
         {...getOverrideProps(overrides, "clientID")}
       ></TextField>
       <TextField
-        label="Staff id"
+        label="Name"
         isRequired={false}
         isReadOnly={false}
-        value={staffID}
+        value={name}
         onChange={(e) => {
           let { value } = e.target;
           if (onChange) {
             const modelFields = {
-              note,
               clientID,
-              staffID: value,
+              name: value,
+              phone,
+              email,
             };
             const result = onChange(modelFields);
-            value = result?.staffID ?? value;
+            value = result?.name ?? value;
           }
-          if (errors.staffID?.hasError) {
-            runValidationTasks("staffID", value);
+          if (errors.name?.hasError) {
+            runValidationTasks("name", value);
           }
-          setStaffID(value);
+          setName(value);
         }}
-        onBlur={() => runValidationTasks("staffID", staffID)}
-        errorMessage={errors.staffID?.errorMessage}
-        hasError={errors.staffID?.hasError}
-        {...getOverrideProps(overrides, "staffID")}
+        onBlur={() => runValidationTasks("name", name)}
+        errorMessage={errors.name?.errorMessage}
+        hasError={errors.name?.hasError}
+        {...getOverrideProps(overrides, "name")}
+      ></TextField>
+      <TextField
+        label="Phone"
+        isRequired={false}
+        isReadOnly={false}
+        value={phone}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              clientID,
+              name,
+              phone: value,
+              email,
+            };
+            const result = onChange(modelFields);
+            value = result?.phone ?? value;
+          }
+          if (errors.phone?.hasError) {
+            runValidationTasks("phone", value);
+          }
+          setPhone(value);
+        }}
+        onBlur={() => runValidationTasks("phone", phone)}
+        errorMessage={errors.phone?.errorMessage}
+        hasError={errors.phone?.hasError}
+        {...getOverrideProps(overrides, "phone")}
+      ></TextField>
+      <TextField
+        label="Email"
+        isRequired={false}
+        isReadOnly={false}
+        value={email}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              clientID,
+              name,
+              phone,
+              email: value,
+            };
+            const result = onChange(modelFields);
+            value = result?.email ?? value;
+          }
+          if (errors.email?.hasError) {
+            runValidationTasks("email", value);
+          }
+          setEmail(value);
+        }}
+        onBlur={() => runValidationTasks("email", email)}
+        errorMessage={errors.email?.errorMessage}
+        hasError={errors.email?.hasError}
+        {...getOverrideProps(overrides, "email")}
       ></TextField>
       <Flex
         justifyContent="space-between"
         {...getOverrideProps(overrides, "CTAFlex")}
       >
         <Button
-          children="Clear"
+          children="Reset"
           type="reset"
           onClick={(event) => {
             event.preventDefault();
             resetStateValues();
           }}
-          {...getOverrideProps(overrides, "ClearButton")}
+          isDisabled={!(idProp || theClientPersonModelProp)}
+          {...getOverrideProps(overrides, "ResetButton")}
         ></Button>
         <Flex
           gap="15px"
@@ -223,7 +280,10 @@ export default function TheNoteCreateForm(props) {
             children="Submit"
             type="submit"
             variation="primary"
-            isDisabled={Object.values(errors).some((e) => e?.hasError)}
+            isDisabled={
+              !(idProp || theClientPersonModelProp) ||
+              Object.values(errors).some((e) => e?.hasError)
+            }
             {...getOverrideProps(overrides, "SubmitButton")}
           ></Button>
         </Flex>

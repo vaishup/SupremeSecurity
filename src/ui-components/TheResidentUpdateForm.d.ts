@@ -26,12 +26,14 @@ export declare type TheResidentUpdateFormInputValues = {
     phoneNo?: string;
     address?: string;
     clientID?: string;
+    email?: string;
 };
 export declare type TheResidentUpdateFormValidationValues = {
     Name?: ValidationFunction<string>;
     phoneNo?: ValidationFunction<string>;
     address?: ValidationFunction<string>;
     clientID?: ValidationFunction<string>;
+    email?: ValidationFunction<string>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
 export declare type TheResidentUpdateFormOverridesProps = {
@@ -40,6 +42,7 @@ export declare type TheResidentUpdateFormOverridesProps = {
     phoneNo?: PrimitiveOverrideProps<TextFieldProps>;
     address?: PrimitiveOverrideProps<TextFieldProps>;
     clientID?: PrimitiveOverrideProps<TextFieldProps>;
+    email?: PrimitiveOverrideProps<TextFieldProps>;
 } & EscapeHatchProps;
 export declare type TheResidentUpdateFormProps = React.PropsWithChildren<{
     overrides?: TheResidentUpdateFormOverridesProps | undefined | null;

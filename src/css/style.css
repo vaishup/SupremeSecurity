@@ -218,8 +218,7 @@ span.flatpickr-weekday,
 }
 .btn-grad {
   background-image: linear-gradient(to right, #a73737 0%, #7a2828 51%, #a73737 100%);
-  padding: 10px;
-  margin-right: 80px;
+
   text-align: center;
   text-transform: uppercase;
   transition: 0.5s;
@@ -230,7 +229,6 @@ span.flatpickr-weekday,
   display: flex; /* Use flexbox to align items */
   align-items: center; /* Center items vertically */
   justify-content: center; /* Center items horizontally */
-  gap: 8px; /* Add space between the icon and text */
 }
 
 .btn-grad:hover {

@@ -102,7 +102,8 @@ const ClientList = () => {
             </span>
           </div>
           <button
-            className="btn-grad w-[180px] pr-20"
+
+            className="btn-grad w-[190px] "
             onClick={() => {
               navigation('/addclient');
             }}
@@ -135,10 +136,10 @@ const ClientList = () => {
                   Business Name
                 </th>
                 <th className="px-6 py-3 border-b border-gray-200 text-white text-left text-sm uppercase font-bold">
-                  PHONE NO
+                Business Phone No
                 </th>
                 <th className="px-6 py-3 border-b border-gray-200 text-white text-left text-sm uppercase font-bold">
-                  EMAIL
+                Business  EMAIL
                 </th>
                 <th className="px-6 py-3 border-b border-gray-200 text-white text-left text-sm uppercase font-bold">
                   Contact Phone

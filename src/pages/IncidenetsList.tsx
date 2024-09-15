@@ -1,4 +1,4 @@
-import { EyeIcon, PencilIcon, Trash2 } from 'lucide-react';
+import { EyeIcon, PencilIcon, Trash2, Mail } from 'lucide-react';
 import Breadcrumb from '../components/Breadcrumbs/Breadcrumb';
 import DefaultLayout from '../layout/DefaultLayout';
 import { useNavigate } from 'react-router-dom';
@@ -8,78 +8,20 @@ import {
   listTheIncidents,
   getTheClient,
 } from '../graphql/queries';
+import { Modal } from 'antd';
+
+import axios from 'axios';
+
 import { generateClient } from 'aws-amplify/api';
 
 const IncidenetsList = () => {
   const client = generateClient();
 
-  const supportTickets = [
-    {
-      id: '001',
-      subject: 'Server Down',
-      location: 'New York Data Center',
-      createdAt: '2024-08-15T09:30:00Z',
-      description:
-        'The main server is down and needs immediate attention. Multiple services are affected.',
-    },
-    {
-      id: '002',
-      subject: 'Email Issues',
-      location: 'Los Angeles Office',
-      createdAt: '2024-08-14T14:45:00Z',
-      description:
-        'Users are experiencing issues with receiving emails. The mail server might be down.',
-    },
-    {
-      id: '003',
-      subject: 'Network Latency',
-      location: 'Chicago Branch',
-      createdAt: '2024-08-13T11:15:00Z',
-      description:
-        'High network latency has been observed during peak hours. Investigation required.',
-    },
-    {
-      id: '004',
-      subject: 'Software Update Failure',
-      location: 'San Francisco Office',
-      createdAt: '2024-08-12T08:20:00Z',
-      description:
-        'The latest software update failed to install on multiple workstations. Rollback needed.',
-    },
-    {
-      id: '005',
-      subject: 'Database Backup Error',
-      location: 'Miami Data Center',
-      createdAt: '2024-08-11T07:50:00Z',
-      description:
-        'Scheduled database backup failed last night. Data integrity needs to be checked.',
-    },
-    {
-      id: '006',
-      subject: 'Security Breach',
-      location: 'Dallas Headquarters',
-      createdAt: '2024-08-10T18:10:00Z',
-      description:
-        'A potential security breach was detected in the main system. Immediate action required.',
-    },
-    {
-      id: '007',
-      subject: 'Printer Malfunction',
-      location: 'Boston Office',
-      createdAt: '2024-08-09T10:30:00Z',
-      description:
-        'The main office printer is malfunctioning, causing delays in document processing.',
-    },
-    {
-      id: '008',
-      subject: 'Power Outage',
-      location: 'Seattle Data Center',
-      createdAt: '2024-08-08T13:00:00Z',
-      description:
-        'A power outage occurred, affecting all servers in the Seattle Data Center.',
-    },
-  ];
   const [incidentList, setIncidentList] = useState([]);
+  const [mailto, setMailto] = useState();
+  const [error, setError] = useState('');
+  const [isOpen, setIsOpen] = useState(false);
+  const [selectedItemId, setSelectedItemId] = useState(null); // State to store the selected item id
 
   useEffect(() => {
     listIncident();
@@ -118,9 +60,9 @@ const IncidenetsList = () => {
       // const pendingTasks = tasksWithClientName.filter(
       //   (task) => task.status === "pending"
       // );
-      const sortedTasks = tasksWithClientName.sort((a, b) =>
-      new Date(b.createdAt) - new Date(a.createdAt)
-    );
+      const sortedTasks = tasksWithClientName.sort(
+        (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
+      );
       setIncidentList(sortedTasks);
     } catch (error) {
       console.error('Error fetching driver details:', error);
@@ -138,15 +80,120 @@ const IncidenetsList = () => {
     };
     return date.toLocaleString('en-US', options);
   };
+  const handleMailIconClick = (itemId) => {
+    setSelectedItemId(itemId); // Store the item id
+    setIsOpen(true); // Open the modal
+  };
   const navigation = useNavigate();
   const [selectedStatus, setSelectedStatus] = useState('All');
 
+  // const sendEmail = async (id) => {
+  //   console.log(id);
+
+  //   const apiUrl = 'https://kwe0mvlph9.execute-api.us-east-2.amazonaws.com/default/sendReportMail-dev';
+
+  //   try {
+  //     const response = await fetch(apiUrl, {
+  //       method: 'POST', // Assuming it's a POST request
+  //       headers: {
+  //         'Content-Type': 'application/json', // Set content type if you're sending JSON
+  //       },
+  //       body: JSON.stringify({
+  //         id: id, // Pass any data required by the function
+  //       }),
+  //     });
+
+  //     if (!response.ok) {
+  //       throw new Error(`Error: ${response.statusText}`);
+  //     }
+
+  //     const data = await response.json();
+  //     console.log('Email sent successfully:', data);
+  //   } catch (error) {
+  //     console.error('Error sending email:', error);
+  //   }
+  // };
+
+  const sendEmail = async () => {
+    // Set loading state to true
+    try {
+      const response = await axios.post(
+        'https://kwe0mvlph9.execute-api.us-east-2.amazonaws.com/default/sendReportMail-dev', // Replace with your API Gateway URL
+        { selectedItemId,mailto }, // Passing id in the body
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        },
+      );
+
+      console.log('Lambda response:', response.data);
+
+      return response.data;
+    } catch (error) {
+      console.error('Error calling Lambda function:', error);
+      // Handle error if necessary
+    } finally {
+      // Set loading state to false
+    }
+  };
+
+  const handleSubmit = async () => {
+    if (!mailto) {
+      setError('Email id is Required');
+    } else {
+      console.log(mailto);
+      setIsOpen(false)
+      sendEmail()
+    }
+  };
   return (
     <>
       <div className="flex items-center justify-between">
         <h2 className="text-title-md2 font-semibold text-primary dark:text-white">
           Incident's List
         </h2>
+
+        <Modal
+          open={isOpen}
+          onCancel={() => setIsOpen(false)}
+          footer={
+            [
+             
+            ]
+          }
+        >
+          <div className="flex flex-col ">
+            {/* Success Icon */}
+            <div className="flex  pl-10 pr-10 bg-gray-100">
+              <div className="bg-white w-full max-w-xl">
+                  <div className="flex flex-col  xl:flex-row">
+                    <div className="w-full mt-4 ">
+                      <label className="block text-black dark:text-white">
+                        Mail to <span className="text-meta-1">*</span>
+                      </label>
+                      <input
+                        value={mailto}
+                        onChange={(e) => setMailto(e.target.value)}
+                        type="text"
+                        name="firstName"
+                        placeholder="Enter Email"
+                        className={`w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary ${
+                          error ? 'border-red-500' : ''
+                        } dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary`}                      />
+                    </div>
+                  </div>
+                  {error && (
+                    <p className="text-red-500 text-sm mt-1">{error}</p>
+                  )}
+
+                  <button onClick={handleSubmit} className="mt-4 btn-grad w-full py-3" type="submit">
+                    Submit
+                  </button>
+              </div>
+            </div>
+          </div>
+        </Modal>
         <div className="relative">
           <select
             value={selectedStatus}
@@ -250,6 +297,13 @@ const IncidenetsList = () => {
                           className="mr-5 inline-block transition duration-300 ease-in-out transform hover:text-red-600 hover:scale-110"
                           color="blue"
                           size={20}
+                        />
+                        <Mail
+                                 color="black"                   className="mr-5 inline-block transition duration-300 ease-in-out transform hover:text-red-600 hover:scale-110"
+
+                          onClick={() => {
+                            handleMailIconClick(order.id)
+                          }}
                         />
                       </div>
                     </td>

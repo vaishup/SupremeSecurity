@@ -1,15 +1,15 @@
-import { PencilIcon, Trash2 } from "lucide-react";
-import Breadcrumb from "../components/Breadcrumbs/Breadcrumb";
-import DefaultLayout from "../layout/DefaultLayout";
-import { useNavigate } from "react-router-dom";
-import React, { useState, useEffect, useRef } from "react";
-import { generateClient } from "aws-amplify/api";
+import { PencilIcon, Trash2 } from 'lucide-react';
+import Breadcrumb from '../components/Breadcrumbs/Breadcrumb';
+import DefaultLayout from '../layout/DefaultLayout';
+import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useRef } from 'react';
+import { generateClient } from 'aws-amplify/api';
 import {
   getTheClient,
   pharmacyGroupCreationRequestsByPharmacyID,
   listTasks,
-} from "../graphql/queries";
-import * as mutation from "../graphql/mutations.js";
+} from '../graphql/queries';
+import * as mutation from '../graphql/mutations.js';
 
 const TaskList = () => {
   const formatDate = (dateString) => {
@@ -31,30 +31,30 @@ const TaskList = () => {
     listTaskss();
   }, []);
   const client = generateClient();
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState('');
   const listTasks = /* GraphQL */ `
-  query ListTasks(
-    $filter: ModelTaskFilterInput
-    $limit: Int
-    $nextToken: String
-  ) {
-    listTasks(filter: $filter, limit: $limit, nextToken: $nextToken) {
-      items {
-        id
-        title
-        description
-        frequency
-        clientId
-        createdAt
-        updatedAt
-        taskTheClientId
+    query ListTasks(
+      $filter: ModelTaskFilterInput
+      $limit: Int
+      $nextToken: String
+    ) {
+      listTasks(filter: $filter, limit: $limit, nextToken: $nextToken) {
+        items {
+          id
+          title
+          description
+          frequency
+          clientId
+          createdAt
+          updatedAt
+          taskTheClientId
+          __typename
+        }
+        nextToken
         __typename
       }
-      nextToken
-      __typename
     }
-  }
-`;
+  `;
   const listTaskss = async () => {
     try {
       const driverData = await client.graphql({
@@ -81,18 +81,18 @@ const TaskList = () => {
           } else {
             console.warn(`Client not found for task with ID ${task.id}`);
             // Return the task without modifying it
-            return { ...task, clientBname: "Unknown Client" }; // Default value if client is not found
+            return { ...task, clientBname: 'Unknown Client' }; // Default value if client is not found
           }
-        })
+        }),
       );
-      const sortedTasks = tasksWithClientName.sort((a, b) =>
-      new Date(b.createdAt) - new Date(a.createdAt)
-    );
+      const sortedTasks = tasksWithClientName.sort(
+        (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
+      );
       // Set the updated task list
       setTaskList(sortedTasks);
-      console.log("Tasks with Client Names:", tasksWithClientName);
+      console.log('Tasks with Client Names:', tasksWithClientName);
     } catch (error) {
-      console.error("Error fetching tasks or client details:", error);
+      console.error('Error fetching tasks or client details:', error);
     }
   };
 
@@ -117,27 +117,27 @@ const TaskList = () => {
       // For example, if you have a state called `orders`:
       // setOrders(orders.filter(order => order.id !== id));
     } catch (error) {
-      console.error("Error deleting item:", error);
+      console.error('Error deleting item:', error);
     }
   };
   const filteredTasks = taskList.filter(
     (client) =>
       client.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       client.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      client.frequency.toLowerCase().includes(searchQuery.toLowerCase())
+      client.frequency.toLowerCase().includes(searchQuery.toLowerCase()),
   );
   return (
     <>
       <div className="flex items-center justify-between">
         <h2 className="text-title-md2 font-semibold text-primary dark:text-white">
-          Task List
+          Protocols List
         </h2>
         <div className="flex flex-row">
           <div className="relative w-[300px] mr-3">
             <input
-              style={{ background: "#e0e0e0" }} // Lighter gray background
+              style={{ background: '#e0e0e0' }} // Lighter gray background
               type="text"
-              placeholder="Search Task by Title/Decription/Frequency..."
+              placeholder="Search Protocol by Title/Decription/Frequency..."
               className="w-full pl-10 pr-3 py-2 rounded-[10px] bg-[#e0e0e0] text-gray-700 placeholder-gray-500 shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all duration-300 ease-in-out"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -160,12 +160,10 @@ const TaskList = () => {
             </span>
           </div>
           <button
-            className="btn-grad w-[180px] pr-20"
+            className="btn-grad w-[220px] "
             onClick={() => {
-              const addString = "add";
-navigation(`/addTask/${addString}`);
-              
-
+              const addString = 'add';
+              navigation(`/addTask/${addString}`);
             }}
           >
             <svg
@@ -182,80 +180,78 @@ navigation(`/addTask/${addString}`);
                 d="M12 4v16m8-8H4"
               ></path>
             </svg>
-            Add New Task
+            Add New Protocol
           </button>
         </div>
       </div>
 
       <div className="overflow-x-auto mt-10">
-      {taskList.length > 0 ? (
-        <table className="min-w-full bg-white rounded-lg shadow overflow-hidden">
-          <thead className="bg-gradient-to-r from-[#7a2828] to-[#a73737]">
-            <tr>
-              <th className="px-6 py-3 border-b border-gray-200 text-white text-left text-sm uppercase font-bold">
-                Title
-              </th>
-              <th className="px-6 py-3 border-b border-gray-200 text-white text-left text-sm uppercase font-bold">
-                Business Name
-              </th>
-              <th className="px-6 py-3 border-b border-gray-200 text-white text-left text-sm uppercase font-bold">
-                Description
-              </th>
-              <th className="px-6 py-3 border-b border-gray-200 text-white text-left text-sm uppercase font-bold">
-                Created Date
-              </th>
-              <th className="px-6 py-3 border-b border-gray-200 text-white text-left text-sm uppercase font-bold">
-                Frequency
-              </th>
-              <th className="px-6 py-3 border-b border-gray-200 text-white text-left text-sm uppercase font-bold">
-                ACTION
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredTasks.map((order) => (
-              <tr key={order.id}>
-                <td className="px-6 py-4 border-b border-gray-200 bg-white text-sm">
-                  {order.title}
-                </td>
-                <td className="px-6 py-4 border-b border-gray-200 bg-white text-sm">
-                  {order.clientBname}
-                </td>
-                <td className="px-6 py-4 border-b border-gray-200 bg-white text-sm">
-                  {order.description}
-                </td>
-                <td className="px-6 py-4 border-b border-gray-200 bg-white text-sm">
-                  {formatDate(order.updatedAt)}
-                </td>
-                <td className="px-6 py-4 border-b border-gray-200 bg-white text-sm">
-                  {order.frequency}
-                </td>
-                <td className="px-6 py-4 border-b border-gray-200 bg-white text-sm flex-row">
-                  <div className="flex flex-row">
-                    <PencilIcon
-                      onClick={() => {
-                        navigation(`/addTask/edit/${order.id}`); // Navigate to AddStaff page with the staff ID
-                      }}
-                      className="mr-5 inline-block transition duration-300 ease-in-out transform hover:text-black hover:scale-110"
-                      color="blue"
-                      size={20}
-                    />
-                    <Trash2
-                      onClick={() => handleDelete(order.id)}
-                      className="inline-block transition duration-300 ease-in-out transform  hover:text-black hover:scale-110"
-                      color="red"
-                      size={20}
-                    />
-                  </div>
-                </td>
+        {taskList.length > 0 ? (
+          <table className="min-w-full bg-white rounded-lg shadow overflow-hidden">
+            <thead className="bg-gradient-to-r from-[#7a2828] to-[#a73737]">
+              <tr>
+                <th className="px-6 py-3 border-b border-gray-200 text-white text-left text-sm uppercase font-bold">
+                  Title
+                </th>
+                <th className="px-6 py-3 border-b border-gray-200 text-white text-left text-sm uppercase font-bold">
+                  Business Name
+                </th>
+                <th className="px-6 py-3 border-b border-gray-200 text-white text-left text-sm uppercase font-bold">
+                  Description
+                </th>
+                <th className="px-6 py-3 border-b border-gray-200 text-white text-left text-sm uppercase font-bold">
+                  Created Date
+                </th>
+                <th className="px-6 py-3 border-b border-gray-200 text-white text-left text-sm uppercase font-bold">
+                  Frequency
+                </th>
+                <th className="px-6 py-3 border-b border-gray-200 text-white text-left text-sm uppercase font-bold">
+                  ACTION
+                </th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-         ) : (
-          <div className="text-center py-10 text-gray-500">
-            No data found
-          </div>
+            </thead>
+            <tbody>
+              {filteredTasks.map((order) => (
+                <tr key={order.id}>
+                  <td className="px-6 py-4 border-b border-gray-200 bg-white text-sm">
+                    {order.title}
+                  </td>
+                  <td className="px-6 py-4 border-b border-gray-200 bg-white text-sm">
+                    {order.clientBname}
+                  </td>
+                  <td className="px-6 py-4 border-b border-gray-200 bg-white text-sm">
+                    {order.description}
+                  </td>
+                  <td className="px-6 py-4 border-b border-gray-200 bg-white text-sm">
+                    {formatDate(order.updatedAt)}
+                  </td>
+                  <td className="px-6 py-4 border-b border-gray-200 bg-white text-sm">
+                    {order.frequency}
+                  </td>
+                  <td className="px-6 py-4 border-b border-gray-200 bg-white text-sm flex-row">
+                    <div className="flex flex-row">
+                      <PencilIcon
+                        onClick={() => {
+                          navigation(`/addTask/edit/${order.id}`); // Navigate to AddStaff page with the staff ID
+                        }}
+                        className="mr-5 inline-block transition duration-300 ease-in-out transform hover:text-black hover:scale-110"
+                        color="blue"
+                        size={20}
+                      />
+                      <Trash2
+                        onClick={() => handleDelete(order.id)}
+                        className="inline-block transition duration-300 ease-in-out transform  hover:text-black hover:scale-110"
+                        color="red"
+                        size={20}
+                      />
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        ) : (
+          <div className="text-center py-10 text-gray-500">No data found</div>
         )}
       </div>
     </>

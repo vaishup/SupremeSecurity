@@ -11,6 +11,7 @@ import { getUrl } from 'aws-amplify/storage';
 import { Modal } from 'antd';
 import { Check } from 'lucide-react';
 import UserOne from '../images/document.png';
+import { Pencil, PencilIcon, Trash2 } from 'lucide-react';
 
 import { getTheClient, listTheStaffs } from '../graphql/queries';
 const AddClient = () => {
@@ -26,11 +27,12 @@ const AddClient = () => {
     contactPersonPhone: '',
     address: '',
     note: '',
+    residentType: '',
   });
   const [files, setFiles] = useState([]);
   const [filePreviews, setFilePreviews] = useState([]); // Ensure this is defined
-  const [errors, setErrors] = useState({});
   const [clientId, setClientId] = useState();
+  const [errors, setErrors] = useState({});
 
   const getS3Url = async (key) => {
     try {
@@ -60,8 +62,6 @@ const AddClient = () => {
           });
 
           const client = staffData.data.getTheClient;
-          console.log('staff...s', client);
-
           setFormData({
             name: client.name,
             phoneNumber: client.phoneno,
@@ -70,6 +70,7 @@ const AddClient = () => {
             contactPersonPhone: client.contactpersonpho,
             note: client.note,
             address: client.address,
+            residentType: client.residentType,
           });
           client;
 
@@ -136,19 +137,32 @@ const AddClient = () => {
   // Validate form data
   const validate = () => {
     const errors = {};
-    if (!formData.name) errors.name = 'Name is required';
+    if (!formData.businessName) errors.name = 'BusinessName is required';
+    if (!formData.contactPersonPhone) errors.name = 'Contact Person Phone is required';
     if (!formData.phoneNumber) errors.phoneNumber = 'Phone number is required';
     if (!formData.email) errors.email = 'Email is required';
-    if (!formData.contactPersonPhone)
-      errors.contactPersonPhone = "Contact person's phone number is required";
+   
     if (!formData.address) errors.address = 'Address is required';
     if (files.length > 10) {
       errors.fileUpload = 'You can only upload up to 10 images.';
     }
+    if (!formData.residentType)
+      errors.residentType = 'Resident Type is required';
     return errors;
   };
   const onDrop = (acceptedFiles: File[]) => {
     setFilePreviewss([...filePreviewss, ...acceptedFiles]);
+  };
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >,
+  ) => {
+    const { name, value } = e.target;
+    setFormData({
+      ...formData, // Keep existing form data
+      [name]: value, // Update the field with the new value
+    });
   };
 
   const { getRootProps, getInputProps } = useDropzone({
@@ -158,9 +172,8 @@ const AddClient = () => {
   });
 
   // Handle form submission
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmits = async (e: React.FormEvent) => {
     e.preventDefault();
-
     const validationErrors = validate();
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
@@ -174,9 +187,9 @@ const AddClient = () => {
       contactpersonpho: formData.contactPersonPhone, // Mapping to 'contactpersonpho' field
       address: formData.address, // Mapping to 'address' field
       note: formData.note, // Mapping to 'note' field
+      residentType: formData.residentType,
     };
     let clientesponse;
-
     if (id) {
       clientesponse = await API.graphql({
         query: mutation.updateTheClient,
@@ -209,20 +222,18 @@ const AddClient = () => {
       }
       ///----------------- fetch images-----------------------------------------------
     } else {
-      console.log('addedsd,,', clientInput);
-
+      console.log("clientInput..",clientInput);
       clientesponse = await API.graphql({
         query: mutation.createTheClient,
         variables: { input: clientInput },
       });
+      console.log(clientesponse);
       console.log('clientInput', clientInput);
       console.log('clientesponse', clientesponse);
-
+   
       const createdItem = clientesponse.data.createTheClient;
       const clientId = createdItem.id; // Replace with actual client ID
-      // console.log('clientId...', clientId);
-      // console.log('createdItem...', createdItem);
-
+      handeleAddCLient(clientId)
       //--------------------------- upload images to s3 bucket--------------------------------------
 
       if (filePreviews.length > 0) {
@@ -265,11 +276,45 @@ const AddClient = () => {
       contactPersonPhone: '',
       address: '',
       note: '',
+      residentType: '',
     });
     setFiles([]);
     setFilePreviews([]);
     setErrors({});
   };
+
+ 
+ const handeleAddCLient  = async(id) => {
+  try {
+    // Map over the 'people' array and create a client mutation for each person
+    
+    const promises = people.map((person) => {
+      const clientInputs = {
+        clientID: id,  // Mapping to 'clientId' field
+        name: person.name,   // Mapping to 'name' field
+        phone: person.phone, // Mapping to 'phone' field
+        email: person.email, // Mapping to 'email' field
+      };
+console.log("clientInputs..",clientInputs);
+      // Return the API request promise
+      return API.graphql({
+        query: mutation.createTheClientPerson,
+        variables: { input: clientInputs },
+      });
+    });
+
+    // Use Promise.all to send all requests concurrently
+    const responses = await Promise.all(promises);
+
+    // Handle successful responses if needed
+    console.log('All people added successfully:', responses);
+    setPeople([]); // Clear the people list after successful submission
+    setErrorsp(''); // Clear any error messages
+  } catch (error) {
+    console.error('Error adding people:', error);
+    setErrorsp('Failed to add some people.');
+  }
+ }
   function renderFilePreview(file) {
     if (file.type.startsWith('image/')) {
       // Render image preview
@@ -316,6 +361,47 @@ const AddClient = () => {
   const handleCancle = () => {
     setIsOpen(false);
     navigation('/stafflist');
+  };
+  //-------- upto five person------------------------
+  // State for the list of people
+  const [people, setPeople] = useState([]);
+  // State for the current input values
+  const [personData, setPersonData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+  });
+  const [errorsp, setErrorsp] = useState('');
+  // Errors (if needed)
+  // Handle input changes for each person
+  const handleInputChangePerson = (e) => {
+    const { name, value } = e.target;
+    setPersonData({
+      ...personData,
+      [name]: value,
+    });
+  };
+  // Add a new person to the list
+  const handleAddMore = () => {
+    // Validation check for empty fields
+    if (!personData.name || !personData.email || !personData.phone) {
+      setErrorsp('Please fill out all fields before adding.');
+      return;
+    }
+  
+    if (people.length >= 5) {
+      setErrorsp('You can only add up to 5 people.');
+      return;
+    }
+    // If all fields are filled and the limit is not exceeded, add the person
+    setPeople([...people, personData]); // Add the current person to the list
+    setPersonData({ name: '', email: '', phone: '' }); // Clear the input fields
+    setErrorsp(''); // Clear any error messages
+  };
+  // Delete a person from the list by index
+  const handleDelete = (index) => {
+    const updatedPeople = people.filter((_, i) => i !== index);
+    setPeople(updatedPeople);
   };
   return (
     <>
@@ -378,12 +464,12 @@ const AddClient = () => {
                 Client's information
               </h3>
             </div>
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmits}>
               <div className="p-6.5 ">
                 <div className="mb-4.5 flex flex-col gap-6 xl:flex-row">
                   <div className="w-full xl:w-1/2">
                     <label className="mb-2.5 block text-black dark:text-white">
-                      Business Name
+                      Business Name <span className="text-meta-1">*</span>
                     </label>
                     <input
                       value={formData.businessName}
@@ -393,52 +479,15 @@ const AddClient = () => {
                       placeholder="Enter your Business Name"
                       className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
                     />
-                  </div>
-                  <div className="w-full xl:w-1/2">
-                    <label className="mb-2.5 block text-black dark:text-white">
-                      Name <span className="text-meta-1">*</span>
-                    </label>
-                    <input
-                      value={formData.name}
-                      onChange={handleInputChange}
-                      name="name"
-                      type="text"
-                      placeholder="Enter your first Name"
-                      className={`w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary ${
-                        errors.name ? 'border-red-500' : ''
-                      } dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary`}
-                    />
-                    {errors.name && (
-                      <p className="text-red-500 text-sm mt-1">{errors.name}</p>
-                    )}
-                  </div>
-
-                  <div className="w-full xl:w-1/2">
-                    <label className="mb-2.5 block text-black dark:text-white">
-                      Phone Number <span className="text-meta-1">*</span>
-                    </label>
-                    <input
-                      value={formData.phoneNumber}
-                      onChange={handleInputChange}
-                      name="phoneNumber"
-                      type="text"
-                      placeholder="Enter your Phone Number"
-                      className={`w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary ${
-                        errors.phoneNumber ? 'border-red-500' : ''
-                      } dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary`}
-                    />
-                    {errors.phoneNumber && (
+                     {errors.businessName && (
                       <p className="text-red-500 text-sm mt-1">
-                        {errors.phoneNumber}
+                        {errors.businessName}
                       </p>
                     )}
                   </div>
-                </div>
-
-                <div className="mb-4.5  w-full flex flex-col gap-6 xl:flex-row">
                   <div className="w-full xl:w-1/2">
                     <label className="mb-2.5 block text-black dark:text-white">
-                      Email <span className="text-meta-1">*</span>
+                      Business Email <span className="text-meta-1">*</span>
                     </label>
                     <input
                       value={formData.email}
@@ -457,6 +506,188 @@ const AddClient = () => {
                     )}
                   </div>
 
+                  <div className="w-full xl:w-1/2">
+                    <label className="mb-2.5 block text-black dark:text-white">
+                      Busines Phone Number{' '}
+                      <span className="text-meta-1">*</span>
+                    </label>
+                    <input
+                      value={formData.phoneNumber}
+                      onChange={handleInputChange}
+                      name="phoneNumber"
+                      type="text"
+                      placeholder="Enter your Phone Number"
+                      className={`w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary ${
+                        errors.phoneNumber ? 'border-red-500' : ''
+                      } dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary`}
+                    />
+                    {errors.phoneNumber && (
+                      <p className="text-red-500 text-sm mt-1">
+                        {errors.phoneNumber}
+                      </p>
+                    )}
+                  </div>
+                </div>
+                <div className="mb-4.5">
+                  <label className="mb-2.5 block text-black dark:text-white">
+                    Address <span className="text-meta-1">*</span>
+                  </label>
+                  <input
+                    value={formData.address}
+                    onChange={handleInputChange}
+                    name="address"
+                    type="text"
+                    placeholder="Enter Address"
+                    className={`w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary ${
+                      errors.address ? 'border-red-500' : ''
+                    } dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary`}
+                  />
+                  {errors.address && (
+                    <p className="text-red-500 text-sm mt-1">
+                      {errors.address}
+                    </p>
+                  )}
+                </div>
+                <div>
+                  <div className="mb-6 flex flex-row justify-between items-center">
+                    <p className="font-medium text-black">
+                      You can add up to 5 people
+                    </p>
+                    <button
+                      className="ml-auto btn-grad w-[120px]"
+                      onClick={handleAddMore}
+                    >
+                      Add More
+                    </button>
+                  </div>
+
+                  <div className="mb-4.5 w-full flex flex-col gap-6 xl:flex-row">
+                    <div className="w-full xl:w-1/2">
+                      <label className="mb-2.5 block text-black dark:text-white">
+                        Name <span className="text-meta-1">*</span>
+                      </label>
+                      <input
+                        value={personData.name}
+                        onChange={handleInputChangePerson}
+                        name="name"
+                        type="text"
+                        placeholder="Enter your name"
+                        className={`w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary ${
+                          errorsp.name ? 'border-red-500' : ''
+                        } dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary`}
+                      />
+                    </div>
+
+                    <div className="w-full xl:w-1/2">
+                      <label className="mb-2.5 block text-black dark:text-white">
+                        Email <span className="text-meta-1">*</span>
+                      </label>
+                      <input
+                        value={personData.email}
+                        onChange={handleInputChangePerson}
+                        name="email"
+                        type="email"
+                        placeholder="Enter your email"
+                        className={`w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary ${
+                          errorsp.email ? 'border-red-500' : ''
+                        } dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary`}
+                      />
+                    </div>
+
+                    <div className="w-full xl:w-1/2">
+                      <label className="mb-2.5 block text-black dark:text-white">
+                        Phone Number <span className="text-meta-1">*</span>
+                      </label>
+                      <input
+                        value={personData.phone}
+                        onChange={handleInputChangePerson}
+                        name="phone"
+                        type="text"
+                        placeholder="Enter your phone number"
+                        className={`w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary ${
+                          errorsp.phone ? 'border-red-500' : ''
+                        } dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary`}
+                      />
+                    </div>
+                  </div>
+                  {errorsp && (
+  <p className="text-red-500 text-sm mt-2">{errorsp}</p>
+)}
+                  {/* {errors && (
+                      <p className="text-red-500 text-sm mt-1">
+                        {errors}
+                      </p>
+                    )} */}
+                  {/* Display the list of people */}
+                  {people.map((person, index) => (
+                    <div
+                      key={index}
+                      className="flex flex-col sm:flex-row items-center justify-between p-4 mb-2 bg-white shadow-md rounded-lg dark:bg-gray-800 dark:border-gray-700"
+                    >
+                      <div className="flex flex-col sm:flex-row sm:gap-3 sm:items-center w-full mt-2 sm:mt-0">
+                        <p className="text-lg text-black dark:text-white">
+                          {index + 1}
+                        </p>
+                        <p className="text-black dark:text-white">
+                          {person.name || 'N/A'}
+                        </p>
+                        <p className="text-black dark:text-white">
+                          {person.phone || 'N/A'}
+                        </p>
+                        <p className="text-black dark:text-white">
+                          {person.email || 'N/A'}
+                        </p>
+                      </div>
+
+                      <Trash2
+                        onClick={() => handleDelete(index)}
+                        className="inline-block transition duration-300 ease-in-out transform hover:text-red-600 hover:scale-110"
+                        color="red"
+                        size={20}
+                      />
+                    </div>
+                  ))}
+                </div>
+
+              <div className="mb-4.5  w-full flex flex-col gap-6 xl:flex-row">
+                  {/* <div className="w-full xl:w-1/2">
+                    <label className="mb-2.5 block text-black dark:text-white">
+                      Name <span className="text-meta-1">*</span>
+                    </label>
+                    <input
+                      value={formData.name}
+                      onChange={handleInputChange}
+                      name="name"
+                      type="text"
+                      placeholder="Enter your first Name"
+                      className={`w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary ${
+                        errors.name ? 'border-red-500' : ''
+                      } dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary`}
+                    />
+                    {errors.name && (
+                      <p className="text-red-500 text-sm mt-1">{errors.name}</p>
+                    )}
+                  </div> */}
+  <div className="w-full xl:w-1/2">
+                  <label className="mb-2.5 block text-black dark:text-white">
+                    Resident Type
+                  </label>
+                  <select
+                    name="residentType" // Ensure this matches the formData key
+                    value={formData.residentType} // Bind the value to formData.residentType
+                    onChange={handleChange} // Handle change to update formData
+                    className={`w-full rounded-lg border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary ${errors.frequency ? 'border-red-500' : ''} dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary`}
+                  >
+                    <option value="">Select Resident</option>
+                    <option value="Drivers">Drivers</option>
+                    <option value="Contractors">Contractors</option>
+                  </select>
+                  {errors.residentType && (
+                    <p className="text-red-500 text-sm mt-1">
+                      {errors.residentType}
+                    </p>
+                  )}
+                </div>
                   <div className="w-full xl:w-1/2">
                     <label className="mb-2.5 block text-black dark:text-white">
                       Contact Person phone{' '}
@@ -478,28 +709,7 @@ const AddClient = () => {
                       </p>
                     )}
                   </div>
-                </div>
-
-                <div className="mb-4.5">
-                  <label className="mb-2.5 block text-black dark:text-white">
-                    Address <span className="text-meta-1">*</span>
-                  </label>
-                  <input
-                    value={formData.address}
-                    onChange={handleInputChange}
-                    name="address"
-                    type="text"
-                    placeholder="Enter Address"
-                    className={`w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary ${
-                      errors.address ? 'border-red-500' : ''
-                    } dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary`}
-                  />
-                  {errors.address && (
-                    <p className="text-red-500 text-sm mt-1">
-                      {errors.address}
-                    </p>
-                  )}
-                </div>
+                </div> 
 
                 <div className="mb-6">
                   <label className="mb-2.5 block text-black dark:text-white">
@@ -515,42 +725,46 @@ const AddClient = () => {
                     <p className="text-red-500 mt-2">{errors.fileUpload}</p>
                   )}
 
-<div className="mt-4 flex flex-wrap gap-4">
-  {/* Check if id exists, render AttachmentPreviews */}
-  {id ? (
-    <AttachmentPreviews filePreviews={filePreviews} />
-  ) : (
-    /* If id is null or doesn't exist, render the file preview */
-    filePreviews.map((preview, index) => (
-      <div key={index} className="m-3">
-        {preview.isImage ? (
-          <>
-            <img
-              width={120}
-              height={120}
-              src={preview.url}
-              alt={`Preview ${index}`}
-              className="rounded border border-gray-300"
-            />
-            <p className="text-x text-black mt-2">{preview.name}</p>
-          </>
-        ) : (
-          <div className="flex flex-col items-center justify-center w-28 h-28 bg-gray-200 rounded">
-            <img
-              src={UserOne}
-              alt="User"
-              width={80}
-              height={80}
-            />
-            <p className="text-x text-black mt-2">{preview.name}</p>
-          </div>
-        )}
-      </div>
-    ))
-  )}
-</div>
-
+                  <div className="mt-4 flex flex-wrap gap-4">
+                    {/* Check if id exists, render AttachmentPreviews */}
+                    {id ? (
+                      <AttachmentPreviews filePreviews={filePreviews} />
+                    ) : (
+                      /* If id is null or doesn't exist, render the file preview */
+                      filePreviews.map((preview, index) => (
+                        <div key={index} className="m-3">
+                          {preview.isImage ? (
+                            <>
+                              <img
+                                width={120}
+                                height={120}
+                                src={preview.url}
+                                alt={`Preview ${index}`}
+                                className="rounded border border-gray-300"
+                              />
+                              <p className="text-x text-black mt-2">
+                                {preview.name}
+                              </p>
+                            </>
+                          ) : (
+                            <div className="flex flex-col items-center justify-center w-28 h-28 bg-gray-200 rounded">
+                              <img
+                                src={UserOne}
+                                alt="User"
+                                width={80}
+                                height={80}
+                              />
+                              <p className="text-x text-black mt-2">
+                                {preview.name}
+                              </p>
+                            </div>
+                          )}
+                        </div>
+                      ))
+                    )}
+                  </div>
                 </div>
+              
 
                 <div className="mb-6">
                   <label className="mb-2.5 block text-black dark:text-white">
@@ -566,7 +780,7 @@ const AddClient = () => {
                   ></textarea>
                 </div>
 
-                <button type="submit" className="btn-grad w-full pr-20">
+                <button type="submit" className="p-3 btn-grad w-full pr-20">
                   Submit
                 </button>
               </div>

@@ -229,7 +229,7 @@ const StaffList = () => {
             </span>
           </div>
           <button
-            className="btn-grad w-[180px] pr-20"
+            className="btn-grad w-[180px] "
             onClick={() => {
              navigation('/addstaff')
             }}
