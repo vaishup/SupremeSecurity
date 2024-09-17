@@ -7,6 +7,7 @@ import * as mutation from '../graphql/mutations.js';
 import { Modal } from 'antd';
 import UpdateModal from '../components/modal/UpdateModal.js';
 import axios from 'axios';
+import { Check } from 'lucide-react';
 
 import {
   pharmacyGroupCreationRequestsByPharmacyID,
@@ -136,9 +137,9 @@ const StaffList = () => {
         variables: {},
       });
       const staffList = staffdata.data.listTheStaffs.items;
-      const sortedTasks = staffList.sort((a, b) =>
-      new Date(b.createdAt) - new Date(a.createdAt)
-    );
+      const sortedTasks = staffList.sort(
+        (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
+      );
       setStaffList(sortedTasks);
       console.log('staffList---', staffList);
     } catch (error) {
@@ -153,47 +154,29 @@ const StaffList = () => {
       client.phoneno.toLowerCase().includes(searchQuery.toLowerCase()) ||
       client.joiningdate.toLowerCase().includes(searchQuery.toLowerCase()),
   );
-  const [isShow, setIsShow] = useState(false);
-  const [selectedId, setSelectedId] = useState(null);
-
-  const handleOpenModal = (id) => {
-    setSelectedId(id); // Set the ID to be passed to the UpdateModal
-    setIsShow(true); // Show the modal
-  };
 
   const transformedInput = {
     clientIds: ['38694d0b-5ada-4a6d-a453-46756bf63db2'],
     staffId: 'bed98454-e9e3-4e4e-a00d-261d3b44b0c9',
   };
   console.log('transformInnput ids ', transformedInput);
+  const [isID, setIsId] = useState(false);
 
-  const triggerCreateBatchFunction = async (patientOrdersArray) => {
-    console.log('patientOrdersArray..', patientOrdersArray);
-
-    //setLoading(true); // Show loader
-    try {
-      // setLoading(true);
-      const response = await axios.post(
-        'https://qf0gs6ydh3.execute-api.us-east-2.amazonaws.com/default/UpdateStaffIdInClient-dev',
-        { orders: patientOrdersArray },
-        {
-          headers: {
-            'Content-Type': 'application/json', // Ensures the server understands the request is in JSON format
-            'Access-Control-Allow-Origin': '*'  // Optional: If you're facing CORS issues, but this should generally be handled by the server
-          },
-        },
-      );
-
-      //navigation(`/batchList`);
-
-      console.log('Lambda response:', response.data);
-      return response.data;
-    } catch (error) {
-    } finally {
-    }
+  const handeModal = (id) => {
+    setIsId(id);
+    setIsShow(true);
   };
-  const handles = () => {
-    triggerCreateBatchFunction(transformedInput);
+  const [isOpen, setIsOpen] = useState(false);
+  const [show, setIsShow] = useState(false);
+  const handleDialogue = () => {
+    setIsShow(true);
+    setIsOpen(false);
+  };
+  const handleCancle = () => {
+    setIsOpen(false);
+    setIsShow(false);
+
+    navigation('/stafflist');
   };
   return (
     <>
@@ -231,7 +214,7 @@ const StaffList = () => {
           <button
             className="btn-grad w-[180px] "
             onClick={() => {
-             navigation('/addstaff')
+              navigation('/addstaff');
             }}
           >
             <svg
@@ -254,53 +237,54 @@ const StaffList = () => {
       </div>
 
       <div className="overflow-x-auto mt-10">
-      {stafflist.length > 0 ? (
-        <table className="min-w-full bg-white rounded-lg shadow overflow-hidden">
-          <thead className="bg-gradient-to-r from-[#7a2828] to-[#a73737]">
-            <tr>
-              <th className="px-6 py-3 border-b border-gray-200 text-white text-left text-sm uppercase font-bold">
-                First Name{' '}
-              </th>
-              <th className="px-6 py-3 border-b border-gray-200 text-white text-left text-sm uppercase font-bold">
-                Email
-              </th>
-              <th className="px-6 py-3 border-b border-gray-200 text-white text-left text-sm uppercase font-bold">
-                Phone Number
-              </th>
-              <th className="px-6 py-3 border-b border-gray-200 text-white text-left text-sm uppercase font-bold">
-                Joining date
-              </th>
-              <th className="px-6 py-3 border-b border-gray-200 text-white text-left text-sm uppercase font-bold">
-                Action
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredStaffs.map((order, index) => (
-              <tr key={order.index}>
-                <td className="px-6 py-4 border-b border-gray-200 bg-white text-sm">
-                  {order.fname}
-                </td>
-                <td className="px-6 py-4 border-b border-gray-200 bg-white text-sm">
-                  {order.lname}
-                </td>
-                <td className="px-6 py-4 border-b border-gray-200 bg-white text-sm">
-                  {order.phoneno}
-                </td>
-                <td className="px-6 py-4 border-b border-gray-200 bg-white text-sm">
-                  {order.joiningdate}
-                </td>
-                <td className="px-6 py-4 border-b border-gray-200 bg-white text-sm flex-row">
-                  <div className="flex flex-row">
-                    <PencilIcon
-                      onClick={
-                        () => navigation(`/addstaff/${order.id}`) // Navigate to AddStaff page with the staff ID
-                      }
-                      className="mr-5 inline-block transition duration-300 ease-in-out transform hover:text-black hover:scale-110"
-                      color="blue"
-                      size={20}
-                    />
-                    {/* <PencilIcon
+        {stafflist.length > 0 ? (
+          <table className="min-w-full bg-white rounded-lg shadow overflow-hidden">
+            <thead className="bg-gradient-to-r from-[#7a2828] to-[#a73737]">
+              <tr>
+                <th className="px-6 py-3 border-b border-gray-200 text-white text-left text-sm uppercase font-bold">
+                  First Name{' '}
+                </th>
+                <th className="px-6 py-3 border-b border-gray-200 text-white text-left text-sm uppercase font-bold">
+                  Email
+                </th>
+                <th className="px-6 py-3 border-b border-gray-200 text-white text-left text-sm uppercase font-bold">
+                  Phone Number
+                </th>
+                <th className="px-6 py-3 border-b border-gray-200 text-white text-left text-sm uppercase font-bold">
+                  Joining date
+                </th>
+                <th className="px-6 py-3 border-b border-gray-200 text-white text-left text-sm uppercase font-bold">
+                  Action
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredStaffs.map((order, index) => (
+                <tr key={order.index}>
+                  <td className="px-6 py-4 border-b border-gray-200 bg-white text-sm">
+                    {order.fname}
+                  </td>
+                  <td className="px-6 py-4 border-b border-gray-200 bg-white text-sm">
+                    {order.lname}
+                  </td>
+                  <td className="px-6 py-4 border-b border-gray-200 bg-white text-sm">
+                    {order.phoneno}
+                  </td>
+                  <td className="px-6 py-4 border-b border-gray-200 bg-white text-sm">
+                    {order.joiningdate}
+                  </td>
+                  <td className="px-6 py-4 border-b border-gray-200 bg-white text-sm flex-row">
+                    <div className="flex flex-row">
+                    
+                      <PencilIcon
+                        onClick={
+                          () => navigation(`/addstaff/${order.id}`) // Navigate to AddStaff page with the staff ID
+                        }
+                        className="ml-3 mr-5 inline-block transition duration-300 ease-in-out transform hover:text-black hover:scale-110"
+                        color="blue"
+                        size={20}
+                      />
+                      {/* <PencilIcon
         onClick={() => handleOpenModal(order.id)}
         className="mr-5 inline-block transition duration-300 ease-in-out transform hover:text-black hover:scale-110"
         color="blue"
@@ -310,24 +294,86 @@ const StaffList = () => {
       <Modal open={isShow} onCancel={() => setIsShow(false)} footer={[]}>
         <UpdateModal id={selectedId} setIsShow={setIsShow} />
       </Modal> */}
-                    <Trash2
-                      onClick={() => handleDelete(order.id)}
-                      className="inline-block transition duration-300 ease-in-out transform  hover:text-black hover:scale-110"
-                      color="red"
-                      size={20}
-                    />
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                   
+                      <Trash2
+                        onClick={() => handleDelete(order.id)}
+                        className="inline-block transition duration-300 ease-in-out transform  hover:text-black hover:scale-110"
+                        color="red"
+                        size={20}
+                      />
+                        <button
+                        onClick={() => {
+                          handeModal(order.id);
+                        }}
+                        className="ml-3 h-6 pl-3 pr-3 bg-primary text-white rounded-full"
+                      >
+                        Assign Client
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         ) : (
-          <div className="text-center py-10 text-gray-500">
-            No data found
-          </div>
+          <div className="text-center py-10 text-gray-500">No data found</div>
         )}
       </div>
+      <Modal open={show} onCancel={handleCancle} footer={[]}>
+                        <UpdateModal id={isID} setIsShow={setIsShow} />
+                      </Modal>
+                      <Modal
+                        open={isOpen}
+                        onCancel={handleCancle}
+                        footer={[
+                          <button
+                            className="text-black mr-5  h-[30px] w-[60px] border border-gray-500 hover:bg-black-600 rounded-lg"
+                            key="back"
+                            onClick={() => setIsOpen(false)}
+                          >
+                            Cancel
+                          </button>,
+                          <button
+                            className="text-white h-[30px]  w-[60px] bg-green-500 hover:bg-green-600 border-none rounded-lg"
+                            key="back"
+                            onClick={handleDialogue}
+                          >
+                            OK
+                          </button>,
+
+                          ,
+                        ]}
+                      >
+                        <div className="flex flex-col items-center justify-center p-5">
+                          {/* Success Icon */}
+                          <div className="mb-4 p-4 rounded-full bg-green-100 text-green-500">
+                            {/* <svg
+        xmlns="http://www.w3.org/2000/svg"
+        className="h-12 w-12"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+        strokeWidth={2}
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M9 12l2 2l4 -4m0 0l2 2l-6 6l-2 -2l-4 -4"
+        />
+      </svg> */}
+                            <Check color="green" size={40} />
+                          </div>
+
+                          {/* Modal Content */}
+                          <p className="text-xl font-semibold text-center mb-2">
+                            Staff added Successfully
+                          </p>
+                          <p className="text-center text-gray-600">
+                            Would you like to add Client Profile to this
+                            Employee?
+                          </p>
+                        </div>
+                      </Modal>
     </>
   );
 };

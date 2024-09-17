@@ -1083,7 +1083,6 @@ const ClientDetails = () => {
 
             {/* sdsd */}
           </div>
-      
         </div>
 
         <div className="justify-end items-end ml-10 bg-white shadow-lg rounded-sm border border-stroke w-full">
@@ -1093,6 +1092,7 @@ const ClientDetails = () => {
             </h4>
 
             <div className="flex space-x-4  mr-4 justify-end items-center mt-">
+          
               <button
                 onClick={() => setIsOpen(true)}
                 className="h-10 pl-3 pr-3 bg-primary text-white rounded-full"
@@ -1111,14 +1111,14 @@ const ClientDetails = () => {
                 onClick={() => setIsOpenTask(true)}
                 className="h-10 pl-3 pr-3 bg-primary text-white rounded-full"
               >
-                Add Task
+                Add Protocols
               </button>
             </div>
           </div>
           <div className="w-full">
             <div className="max-h-60 overflow-x-auto  w-full">
-            <div className="flex justify-end space-x-2 mb-4">
-        {/* <button
+              <div className="flex justify-end space-x-2 mb-4">
+                {/* <button
           onClick={() => handleSort('asc')}
           className={`px-4 py-2 rounded ${sortOrder === 'asc' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
         >
@@ -1130,7 +1130,7 @@ const ClientDetails = () => {
         >
           Date Desc
         </button> */}
-      </div>
+              </div>
               {postList.length > 0 ? (
                 <table className="mt-4 p-3 min-w-full bg-white rounded-lg shadow w-full">
                   <tbody className="w-full">
@@ -1182,7 +1182,7 @@ const ClientDetails = () => {
                     : 'bg-white text-black border-transparent hover:bg-gray-200'
                 }`}
               >
-                Client's People List
+                Management
               </button>
               <button
                 onClick={() => handleTabClick('ResList')}
@@ -1191,7 +1191,7 @@ const ClientDetails = () => {
                     ? 'bg-[#7a2828] text-white border-[#7a2828]'
                     : 'bg-white text-black border-transparent hover:bg-gray-200'
                 }`}
-              >
+              > 
                 {resident} List
               </button>
               <button
@@ -1202,7 +1202,7 @@ const ClientDetails = () => {
                     : 'bg-white text-black border-transparent hover:bg-gray-200'
                 }`}
               >
-                TASK LIST
+                PROTOCOLS LIST
               </button>
               <button
                 onClick={() => handleTabClick('IncidentList')}

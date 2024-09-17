@@ -8,7 +8,8 @@ import { generateClient } from 'aws-amplify/api';
 import { useNavigate } from 'react-router-dom'; // Import hooks from react-router-dom
 import {
   pharmacyGroupCreationRequestsByPharmacyID,
-  listTheStaffs,getTheClient
+  listTheStaffs,
+  getTheClient,
 } from '../../graphql/queries';
 const UpdateModal = ({ id, setIsShow }) => {
   console.log('id', id);
@@ -32,6 +33,11 @@ const UpdateModal = ({ id, setIsShow }) => {
     setIsModalShow(false);
     setIsShow(false);
   };
+  useEffect(() => {
+    if (isModalShow) {
+      setSelectedClients([]); // Clear the selected clients array when the modal is opened
+    }
+  }, [isModalShow]); // Run when `isModalShow` changes
 
   useEffect(() => {
     listClient();
@@ -132,11 +138,11 @@ const UpdateModal = ({ id, setIsShow }) => {
             });
 
             const existingClient = clientData.data.getTheClient;
-            console.log("existingClient",existingClient);
-            
+            console.log('existingClient', existingClient);
+
             let existingStaffIds = existingClient.staffids || []; // Retrieve or initialize the staffIds array
-            console.log("existingStaffIds",existingStaffIds);
-            
+            console.log('existingStaffIds', existingStaffIds);
+
             // Step 2: Add new staff ID if it's not already in the array
             if (!existingStaffIds.includes(input.id)) {
               existingStaffIds.push(input.id);

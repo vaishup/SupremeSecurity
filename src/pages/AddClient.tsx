@@ -57,7 +57,7 @@ const AddClient = () => {
   };
   useEffect(() => {
     if (id) {
-      const fetchClientfData = async () => {
+      const fetchClientData = async () => {
         try {
           console.log('Fetching staff with ID:', id); // Debug log
 
@@ -67,6 +67,8 @@ const AddClient = () => {
           });
 
           const client = staffData.data.getTheClient;
+          console.log('client', client);
+
           setFormData({
             name: client.name,
             phoneNumber: client.phoneno,
@@ -77,26 +79,69 @@ const AddClient = () => {
             address: client.address,
             residentType: client.residentType,
           });
-          client;
 
+          // Process attachments for file previews
           if (client.attachments && Array.isArray(client.attachments)) {
-            const urls = await Promise.all(
+            const previews = await Promise.all(
               client.attachments.map(async (attachment) => {
-                return await getS3Url(attachment);
+                console.log('attachments...', attachment);
+                const parts = attachment.split('/');
+
+                // Get the folder type ('image')
+                const folderType = parts[parts.length - 2];
+
+                // Get the file name ('IMG_6458.PNG')
+                const fileName = parts[parts.length - 1];
+
+                const fileExtension = fileName.split('.').pop().toLowerCase();
+
+                // Determine the file type based on the extension
+                let fileType = '';
+                
+                if (['jpeg', 'jpg', 'png', 'gif' ,'PNG'].includes(fileExtension)) {
+                  fileType = 'image';
+                } else if (fileExtension === 'pdf') {
+                  fileType = 'pdf';
+                } else if (['xlsx', 'xls'].includes(fileExtension)) {
+                  fileType = 'spreadsheet';
+                } else {
+                  fileType = 'unknown';
+                }
+                const imageExtensions = ['jpg', 'PNG', 'jpeg', 'png', 'gif', 'bmp', 'webp'];
+
+                console.log('File Name:', fileName);     // Output: IMG_6458.PNG
+                console.log('File Type:', fileType);  
+                // Check for type and fallback to empty string if undefined
+                const attachmentType = folderType;
+                const isImage = imageExtensions.includes(fileExtension);
+                console.log('attachmentType', attachmentType);
+                console.log('attachmentType', isImage);
+
+                // Ensure you have the URL fetched correctly from S3
+                const url = await getS3Url(attachment);
+                console.log(url);
+
+                return {
+                  file: null, // No file object for previously uploaded files
+                  url, // Fetched S3 URL
+                  name: fileName || 'Unknown', // Fallback name if unavailable
+                  isImage, // Flag to check if the file is an image
+                };
               }),
             );
-            console.log('urls...', urls);
 
-            setFilePreviews(urls);
+            setFilePreviews(previews);
           }
         } catch (error) {
           console.error('Error fetching staff data:', error);
         }
       };
-      fetchClientfData();
+      fetchClientData();
       listPeople(id);
     }
   }, [id]);
+console.log("filePreviews",filePreviews);
+
   // Handle input changes
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -219,16 +264,40 @@ const AddClient = () => {
           variables: { input: updateInput },
         });
         console.log(createdItem, 'suceesfully created');
-        console.log("peopple...",people);
-        
+        console.log('peopple...', people);
+
         // handeleAddCLient(clientId);
         // Handle the success (e.g., update UI, make further API calls)
       } catch (error) {
         console.error('Error uploading file:', error);
         // Handle the error (e.g., display error message to user)
       }
-      handeleUpdateClient(id)
-      navigation('/clientlist')
+      if (filePreviews.length > 0) {
+        // Upload files to S3 only if there are file previews
+        try {
+          const uploadedFiles = await Promise.all(
+            filePreviews.map((file) =>
+              uploadToS3s(file.file, clientId, file.name),
+            ), // Make sure to pass the file object, not the entire preview object
+          );
+
+          const updateInput = {
+            id: clientId,
+            attachments: uploadedFiles,
+          };
+          console.log('updateInput/...', updateInput);
+
+          const update = await API.graphql({
+            query: mutation.updateTheClient,
+            variables: { input: updateInput },
+          });
+          console.log(update, 'successfully updated');
+        } catch (error) {
+          console.error('Error uploading file:', error);
+        }
+      }
+      handeleUpdateClient(id);
+      navigation('/clientlist');
       ///----------------- fetch images-----------------------------------------------
     } else {
       console.log('clientInput..', clientInput);
@@ -243,7 +312,7 @@ const AddClient = () => {
       const createdItem = clientesponse.data.createTheClient;
       const clientId = createdItem.id; // Replace with actual client ID
       handeleAddCLient(clientId);
-     
+
       //--------------------------- upload images to s3 bucket--------------------------------------
 
       if (filePreviews.length > 0) {
@@ -325,8 +394,10 @@ const AddClient = () => {
   const handeleUpdateClient = async (id) => {
     try {
       // Filter out people who already have a clientID or id
-      const newPeople = people.filter((person) => !person.clientID && !person.id);
-  
+      const newPeople = people.filter(
+        (person) => !person.clientID && !person.id,
+      );
+
       // Map over the 'newPeople' array and create a client mutation for each person
       const promises = newPeople.map((person) => {
         const clientInputs = {
@@ -335,17 +406,17 @@ const AddClient = () => {
           phone: person.phone, // Mapping to 'phone' field
           email: person.email, // Mapping to 'email' field
         };
-  
+
         // Return the API request promise for new people without clientID or id
         return API.graphql({
           query: mutation.createTheClientPerson,
           variables: { input: clientInputs },
         });
       });
-  
+
       // Use Promise.all to send all requests concurrently
       const responses = await Promise.all(promises);
-  
+
       // Handle successful responses if needed
       console.log('All people added successfully:', responses);
       setPeople([]); // Clear the people list after successful submission
@@ -355,7 +426,7 @@ const AddClient = () => {
       setErrorsp('Failed to add some people.');
     }
   };
-  
+
   const handeleAddCLient = async (id) => {
     try {
       // Map over the 'people' array and create a client mutation for each person
@@ -496,8 +567,6 @@ const AddClient = () => {
       console.log('Client deleted locally.');
     }
   };
-
-
 
   return (
     <>
@@ -709,7 +778,7 @@ const AddClient = () => {
                       </p>
                     )} */}
                 {/* Display the list of people */}
-                
+
                 {people.map((person, index) => (
                   <div
                     key={index}
@@ -817,41 +886,40 @@ const AddClient = () => {
 
                 <div className="mt-4 flex flex-wrap gap-4">
                   {/* Check if id exists, render AttachmentPreviews */}
-                  {id ? (
+                  {/* {id ? (
                     <AttachmentPreviews filePreviews={filePreviews} />
-                  ) : (
-                    /* If id is null or doesn't exist, render the file preview */
-                    filePreviews.map((preview, index) => (
-                      <div key={index} className="m-3">
-                        {preview.isImage ? (
-                          <>
-                            <img
-                              width={120}
-                              height={120}
-                              src={preview.url}
-                              alt={`Preview ${index}`}
-                              className="rounded border border-gray-300"
-                            />
-                            <p className="text-x text-black mt-2">
-                              {preview.name}
-                            </p>
-                          </>
-                        ) : (
-                          <div className="flex flex-col items-center justify-center w-28 h-28 bg-gray-200 rounded">
-                            <img
-                              src={UserOne}
-                              alt="User"
-                              width={80}
-                              height={80}
-                            />
-                            <p className="text-x text-black mt-2">
-                              {preview.name}
-                            </p>
-                          </div>
-                        )}
-                      </div>
-                    ))
-                  )}
+                  ) : ( */}
+
+                  {filePreviews.map((preview, index) => (
+                    <div key={index} className="m-3">
+                      {preview.isImage ? (
+                        <>
+                          <img
+                            width={120}
+                            height={120}
+                            src={preview.url}
+                            alt={`Preview ${index}`}
+                            className="rounded border border-gray-300"
+                          />
+                          <p className="text-x text-black mt-2">
+                            {preview.name}
+                          </p>
+                        </>
+                      ) : (
+                        <div className="flex flex-col items-center justify-center w-28 h-28 bg-gray-200 rounded">
+                          <img
+                            src={UserOne}
+                            alt="User"
+                            width={80}
+                            height={80}
+                          />
+                          <p className="text-x text-black mt-2">
+                            {preview.name}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  ))}
                 </div>
               </div>
 
@@ -883,31 +951,38 @@ const AddClient = () => {
     </>
   );
 };
-const renderAttachment = (url) => {
-  // Check if the file is an image
+const renderAttachment = (preview) => {
+  // Check if the URL is a valid string
+  if (typeof preview.url !== 'string') {
+    console.log('url..', preview.url);
+    console.error('Invalid URL:', preview.url); // Debugging log for invalid URLs
+    return null; // Return nothing if URL is invalid
+  }
+  console.log('name.', name);
+
+  // Check if the file is an image using regex match
   const isImage = url.match(/\.(jpeg|jpg|gif|png|PNG)(\?.*)?$/);
   if (isImage) {
     // Render an image preview
     return (
       <div key={url} className="file-preview">
-        <img className="m-3" width={120} height={120} src={url} />
-        {/* <img src={url} alt="attachment" className="image-preview" /> */}
+        <img className="m-3" width={120} height={120} src={url} alt="Preview" />
       </div>
     );
   } else {
-    // Render a file icon with a download option
+    console.log(url);
+    // Render a file icon with a download option for non-image files
     return (
       <div key={url} className="file-preview">
         <a href={url} download className="file-download">
           <img src={UserOne} alt="User" width={80} height={80} />
-
-          {/* Replace with a file icon */}
-          <span>Download </span>
+          <span>Download</span>
         </a>
       </div>
     );
   }
 };
+
 const AttachmentPreviews = ({ filePreviews }) => {
   return (
     <div className="attachment-previews">
