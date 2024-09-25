@@ -839,8 +839,8 @@ console.log("filePreviews",filePreviews);
                     className={`w-full rounded-lg border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary ${errors.frequency ? 'border-red-500' : ''} dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary`}
                   >
                     <option value="">Select Resident</option>
-                    <option value="Drivers">Drivers</option>
-                    <option value="Contractors">Contractors</option>
+                    <option value="Residents">Residents</option>
+                    <option value="Drivers/Contractors"> Drivers/Contractors</option>
                   </select>
                   {errors.residentType && (
                     <p className="text-red-500 text-sm mt-1">

@@ -1192,7 +1192,7 @@ const ClientDetails = () => {
                     : 'bg-white text-black border-transparent hover:bg-gray-200'
                 }`}
               > 
-                {resident} List
+                {resident} 
               </button>
               <button
                 onClick={() => handleTabClick('TaskList')}
